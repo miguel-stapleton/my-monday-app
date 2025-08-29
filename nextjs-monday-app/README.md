@@ -194,3 +194,4 @@ const response = await fetch('/api/monday', {
 - [Next.js Documentation](https://nextjs.org/docs)
 - [Monday.com API Documentation](https://developer.monday.com/api-reference/docs)
 - [TypeScript Documentation](https://www.typescriptlang.org/docs/)
+# ff-monday-app
