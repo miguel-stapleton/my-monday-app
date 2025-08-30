@@ -1,0 +1,35 @@
+[
+  {
+    "name": "Base",
+    "config": {
+      "title": "Get a quote",
+      "subtitle": "Even if you just want some information, let us know what's on your mind! We'll fill you in on everything you need to know.",
+      "recordNamePrefix": "Bride- ",
+      "hairstylists": [
+        "I don't know which hairstylist to choose",
+        "Agne Kanapeckaite",
+        "Lília Costa",
+        "Andreia de Matos",
+        "Eric Ribeiro",
+        "Oksana Grybbinyk",
+        "Joana Carvalho",
+        "Olga Hilário"
+      ],
+      "makeupArtists": [
+        "I don't know which make-up artist to choose",
+        "Inês Aguiar (founder artist)",
+        "Lola Carvalho (founder artist)",
+        "Teresa Pilkington (founder artist)",
+        "Miguel Stapleton (founder artist)",
+        "Ana Neves (resident artist)",
+        "Ana Roma (resident artist)",
+        "Sara Jogo (resident artist)",
+        "Sofia Monteiro (fresh artist)",
+        "Rita Nunes (fresh artist)",
+        "Filipa Wahnon (fresh artist)"
+      ]
+    },
+    "createdAt": "2025-08-30T10:32:21.287Z",
+    "updatedAt": "2025-08-30T10:32:21.287Z"
+  }
+]

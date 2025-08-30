@@ -1,5 +1,5 @@
 import Head from 'next/head'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 interface FormData {
   brideName: string
@@ -17,6 +17,23 @@ interface FormConfig {
   title: string
   subtitle: string
   recordNamePrefix: string
+}
+
+interface SavedConfig {
+  name: string
+  config: FormConfig & {
+    hairstylists: string[]
+    makeupArtists: string[]
+  }
+  createdAt: string
+  updatedAt: string
+}
+
+interface SaveDialogState {
+  isOpen: boolean
+  configName: string
+  isDuplicate: boolean
+  existingConfigName?: string
 }
 
 const countries = [
@@ -71,6 +88,7 @@ export default function Home() {
   const [submitError, setSubmitError] = useState('')
   const [triadeUrl, setTriadeUrl] = useState('')
   const [showEmbedCode, setShowEmbedCode] = useState(false)
+  const [selectedEmbedConfig, setSelectedEmbedConfig] = useState('')
   const [formConfig, setFormConfig] = useState<FormConfig>({
     title: 'Wedding Beauty Services Form',
     subtitle: 'Submit your wedding beauty service requirements',
@@ -84,6 +102,13 @@ export default function Home() {
     artistId: '',
     type: 'hairstylist' as 'hairstylist' | 'makeup'
   })
+  const [savedConfigs, setSavedConfigs] = useState<SavedConfig[]>([])
+  const [saveDialog, setSaveDialog] = useState<SaveDialogState>({
+    isOpen: false,
+    configName: '',
+    isDuplicate: false
+  })
+  const [isLoadingConfigs, setIsLoadingConfigs] = useState(false)
 
   const handleInputChange = (field: keyof FormData, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }))
@@ -168,18 +193,126 @@ export default function Home() {
     setFormConfig(prev => ({ ...prev, [field]: value }))
   }
 
-  const handleSaveConfig = () => {
-    // Save form config to local storage or API
-    localStorage.setItem('formConfig', JSON.stringify(formConfig))
-  }
-
-  const handleLoadConfig = () => {
-    // Load form config from local storage or API
-    const storedConfig = localStorage.getItem('formConfig')
-    if (storedConfig) {
-      setFormConfig(JSON.parse(storedConfig))
+  const loadSavedConfigs = async () => {
+    try {
+      setIsLoadingConfigs(true)
+      const response = await fetch('/api/form-configs')
+      const data = await response.json()
+      if (response.ok) {
+        setSavedConfigs(data.configs || [])
+      }
+    } catch (error) {
+      console.error('Error loading configs:', error)
+    } finally {
+      setIsLoadingConfigs(false)
     }
   }
+
+  const handleOpenSaveDialog = () => {
+    setSaveDialog({
+      isOpen: true,
+      configName: '',
+      isDuplicate: false
+    })
+  }
+
+  const handleSaveDialogNameChange = (name: string) => {
+    const isDuplicate = savedConfigs.some(config => config.name === name)
+    setSaveDialog(prev => ({
+      ...prev,
+      configName: name,
+      isDuplicate,
+      existingConfigName: isDuplicate ? name : undefined
+    }))
+  }
+
+  const handleSaveConfig = async (overwrite = false) => {
+    if (!saveDialog.configName.trim()) {
+      alert('Please enter a configuration name')
+      return
+    }
+
+    try {
+      const configToSave = {
+        ...formConfig,
+        hairstylists: editableHairstylists,
+        makeupArtists: editableMakeupArtists
+      }
+
+      const response = await fetch('/api/form-configs', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: saveDialog.configName.trim(),
+          config: configToSave,
+          overwrite
+        }),
+      })
+
+      const data = await response.json()
+
+      if (response.ok) {
+        alert('Configuration saved successfully!')
+        setSaveDialog({ isOpen: false, configName: '', isDuplicate: false })
+        loadSavedConfigs() // Refresh the list
+      } else if (response.status === 409 && !overwrite) {
+        // Configuration name already exists, but we haven't tried to overwrite yet
+        // The dialog will show the overwrite option
+      } else {
+        alert(data.error || 'Failed to save configuration')
+      }
+    } catch (error) {
+      alert('Network error. Please try again.')
+    }
+  }
+
+  const handleLoadConfig = async (configName: string) => {
+    try {
+      const config = savedConfigs.find(c => c.name === configName)
+      if (config) {
+        setFormConfig({
+          title: config.config.title,
+          subtitle: config.config.subtitle,
+          recordNamePrefix: config.config.recordNamePrefix
+        })
+        setEditableHairstylists(config.config.hairstylists || [...hairstylists])
+        setEditableMakeupArtists(config.config.makeupArtists || [...makeupArtists])
+        alert(`Configuration "${configName}" loaded successfully!`)
+      }
+    } catch (error) {
+      alert('Failed to load configuration')
+    }
+  }
+
+  const handleDeleteConfig = async (configName: string) => {
+    if (!confirm(`Are you sure you want to delete the configuration "${configName}"?`)) {
+      return
+    }
+
+    try {
+      const response = await fetch(`/api/form-configs?name=${encodeURIComponent(configName)}`, {
+        method: 'DELETE'
+      })
+
+      const data = await response.json()
+
+      if (response.ok) {
+        alert('Configuration deleted successfully!')
+        loadSavedConfigs() // Refresh the list
+      } else {
+        alert(data.error || 'Failed to delete configuration')
+      }
+    } catch (error) {
+      alert('Network error. Please try again.')
+    }
+  }
+
+  // Load saved configs on component mount
+  useEffect(() => {
+    loadSavedConfigs()
+  }, [])
 
   const handleAddArtist = () => {
     if (newArtist.type === 'hairstylist') {
@@ -646,7 +779,7 @@ export default function Home() {
               />
             </div>
             <button
-              onClick={handleSaveConfig}
+              onClick={handleOpenSaveDialog}
               style={{
                 padding: '1rem',
                 backgroundColor: '#007bff',
@@ -656,27 +789,203 @@ export default function Home() {
                 fontSize: '16px',
                 fontWeight: 'bold',
                 cursor: 'pointer',
-                transition: 'background-color 0.2s'
+                transition: 'background-color 0.2s',
+                marginBottom: '0.5rem',
+                width: '100%'
               }}
             >
               Save Config
             </button>
+
+            {/* Save Dialog */}
+            {saveDialog.isOpen && (
+              <div style={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backgroundColor: 'rgba(0,0,0,0.5)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                zIndex: 1000
+              }}>
+                <div style={{
+                  backgroundColor: 'white',
+                  padding: '2rem',
+                  borderRadius: '8px',
+                  boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
+                  minWidth: '400px',
+                  maxWidth: '500px'
+                }}>
+                  <h3 style={{ marginBottom: '1rem', color: '#333' }}>Save Configuration</h3>
+                  <div style={{ marginBottom: '1rem' }}>
+                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>
+                      Configuration Name
+                    </label>
+                    <input
+                      type="text"
+                      value={saveDialog.configName}
+                      onChange={(e) => handleSaveDialogNameChange(e.target.value)}
+                      placeholder="Enter configuration name..."
+                      style={{
+                        width: '100%',
+                        padding: '0.75rem',
+                        border: '1px solid #ddd',
+                        borderRadius: '4px',
+                        fontSize: '16px'
+                      }}
+                      autoFocus
+                    />
+                  </div>
+
+                  {saveDialog.isDuplicate && (
+                    <div style={{
+                      marginBottom: '1rem',
+                      padding: '1rem',
+                      backgroundColor: '#fff3cd',
+                      border: '1px solid #ffeaa7',
+                      borderRadius: '4px',
+                      color: '#856404'
+                    }}>
+                      <strong>Warning:</strong> A configuration with the name "{saveDialog.existingConfigName}" already exists.
+                      <br />
+                      Do you want to overwrite it?
+                    </div>
+                  )}
+
+                  <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
+                    <button
+                      onClick={() => setSaveDialog({ isOpen: false, configName: '', isDuplicate: false })}
+                      style={{
+                        padding: '0.75rem 1.5rem',
+                        backgroundColor: '#6c757d',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '4px',
+                        fontSize: '14px',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      Cancel
+                    </button>
+                    {saveDialog.isDuplicate && (
+                      <button
+                        onClick={() => handleSaveDialogNameChange('')}
+                        style={{
+                          padding: '0.75rem 1.5rem',
+                          backgroundColor: '#28a745',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '4px',
+                          fontSize: '14px',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        Change Name
+                      </button>
+                    )}
+                    <button
+                      onClick={() => handleSaveConfig(saveDialog.isDuplicate)}
+                      style={{
+                        padding: '0.75rem 1.5rem',
+                        backgroundColor: saveDialog.isDuplicate ? '#dc3545' : '#007bff',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '4px',
+                        fontSize: '14px',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      {saveDialog.isDuplicate ? 'Overwrite' : 'Save'}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Saved Configurations */}
+            <div style={{ marginTop: '1rem' }}>
+              <h3 style={{ marginBottom: '1rem', color: '#333', fontSize: '18px' }}>Saved Configurations</h3>
+              {isLoadingConfigs ? (
+                <p style={{ color: '#666', fontStyle: 'italic' }}>Loading configurations...</p>
+              ) : savedConfigs.length === 0 ? (
+                <p style={{ color: '#666', fontStyle: 'italic' }}>No saved configurations</p>
+              ) : (
+                <div style={{ maxHeight: '200px', overflowY: 'auto' }}>
+                  {savedConfigs.map((config) => (
+                    <div key={config.name} style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      padding: '0.5rem',
+                      marginBottom: '0.5rem',
+                      backgroundColor: '#f8f9fa',
+                      borderRadius: '4px',
+                      border: '1px solid #e9ecef'
+                    }}>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ fontWeight: 'bold', fontSize: '14px' }}>{config.name}</div>
+                        <div style={{ fontSize: '12px', color: '#666' }}>
+                          Updated: {new Date(config.updatedAt).toLocaleDateString()}
+                        </div>
+                      </div>
+                      <div style={{ display: 'flex', gap: '0.25rem' }}>
+                        <button
+                          onClick={() => handleLoadConfig(config.name)}
+                          style={{
+                            padding: '0.25rem 0.5rem',
+                            backgroundColor: '#28a745',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '3px',
+                            fontSize: '12px',
+                            cursor: 'pointer'
+                          }}
+                        >
+                          Load
+                        </button>
+                        <button
+                          onClick={() => handleDeleteConfig(config.name)}
+                          style={{
+                            padding: '0.25rem 0.5rem',
+                            backgroundColor: '#dc3545',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '3px',
+                            fontSize: '12px',
+                            cursor: 'pointer'
+                          }}
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
             <button
-              onClick={handleLoadConfig}
+              onClick={() => loadSavedConfigs()}
               style={{
-                padding: '1rem',
-                backgroundColor: '#28a745',
+                padding: '0.75rem',
+                backgroundColor: '#17a2b8',
                 color: 'white',
                 border: 'none',
                 borderRadius: '4px',
-                fontSize: '16px',
+                fontSize: '14px',
                 fontWeight: 'bold',
                 cursor: 'pointer',
-                transition: 'background-color 0.2s'
+                transition: 'background-color 0.2s',
+                marginTop: '0.5rem',
+                width: '100%'
               }}
             >
-              Load Config
+              Refresh Configurations
             </button>
+
             <h3 style={{ marginBottom: '1rem', color: '#333' }}>Artist Management</h3>
             <div>
               <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>
@@ -833,6 +1142,36 @@ export default function Home() {
           {showEmbedCode && (
             <div style={{ marginTop: '1.5rem' }}>
               <h3 style={{ marginBottom: '1rem', color: '#333' }}>Embeddable Form Code</h3>
+              
+              {/* Configuration Selection */}
+              <div style={{ marginBottom: '1rem' }}>
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>
+                  Select Configuration to Embed:
+                </label>
+                <select
+                  value={selectedEmbedConfig}
+                  onChange={(e) => setSelectedEmbedConfig(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '0.75rem',
+                    border: '1px solid #ddd',
+                    borderRadius: '4px',
+                    fontSize: '16px',
+                    backgroundColor: 'white'
+                  }}
+                >
+                  <option value="">Default Configuration</option>
+                  {savedConfigs.map((config) => (
+                    <option key={config.name} value={config.name}>
+                      {config.name}
+                    </option>
+                  ))}
+                </select>
+                <p style={{ fontSize: '12px', color: '#666', marginTop: '0.25rem' }}>
+                  Choose a saved configuration or use the default settings
+                </p>
+              </div>
+
               <p style={{ marginBottom: '1rem', color: '#666', fontSize: '14px' }}>
                 Copy and paste this code into your website to embed the wedding form:
               </p>
@@ -849,7 +1188,7 @@ export default function Home() {
 <iframe
 width="900"
 height="1600"
-src="${typeof window !== 'undefined' ? window.location.origin : 'https://your-domain.com'}">
+src="${typeof window !== 'undefined' ? window.location.origin : 'https://your-domain.com'}/embed${selectedEmbedConfig ? `?config=${encodeURIComponent(selectedEmbedConfig)}` : ''}">
 </iframe>
 </div>`}</code>
               </div>
@@ -859,7 +1198,7 @@ src="${typeof window !== 'undefined' ? window.location.origin : 'https://your-do
 <iframe
 width="900"
 height="1600"
-src="${typeof window !== 'undefined' ? window.location.origin : 'https://your-domain.com'}">
+src="${typeof window !== 'undefined' ? window.location.origin : 'https://your-domain.com'}/embed${selectedEmbedConfig ? `?config=${encodeURIComponent(selectedEmbedConfig)}` : ''}">
 </iframe>
 </div>`
                   navigator.clipboard.writeText(embedCode)

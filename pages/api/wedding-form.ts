@@ -72,7 +72,7 @@ export default async function handler(
 
     // Map column titles to IDs
     const getColumnId = (title: string) => {
-      const column = columns.find(col => 
+      const column = columns.find((col: any) => 
         col.title.toLowerCase().includes(title.toLowerCase()) ||
         col.title.toLowerCase().replace(/[^a-z0-9]/g, '').includes(title.toLowerCase().replace(/[^a-z0-9]/g, ''))
       )
