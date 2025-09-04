@@ -49,6 +49,15 @@ export default async function handler(
       }
     `
 
+    console.log('Environment check:', {
+      hasMongoUri: !!process.env.MONGODB_URI,
+      hasMongoDb: !!process.env.MONGODB_DB,
+      hasMondayToken: !!process.env.MONDAY_API_TOKEN,
+      hasMondayBoard: !!process.env.MONDAY_BOARD_ID,
+      mondayTokenLength: process.env.MONDAY_API_TOKEN?.length || 0,
+      mondayBoardId: process.env.MONDAY_BOARD_ID
+    })
+
     const boardResponse = await fetch('https://api.monday.com/v2', {
       method: 'POST',
       headers: {
