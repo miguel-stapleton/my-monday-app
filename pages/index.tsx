@@ -88,6 +88,7 @@ export default function Home() {
   const [submitError, setSubmitError] = useState('')
   const [triadeUrl, setTriadeUrl] = useState('')
   const [showEmbedCode, setShowEmbedCode] = useState(false)
+  const [showArtistManagement, setShowArtistManagement] = useState(false)
   const [selectedEmbedConfig, setSelectedEmbedConfig] = useState('')
   const [formConfig, setFormConfig] = useState<FormConfig>({
     title: 'Wedding Beauty Services Form',
@@ -1063,126 +1064,183 @@ export default function Home() {
             </button>
 
             <h3 style={{ marginBottom: '1rem', color: '#333' }}>Artist Management</h3>
-            <div>
-              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>
-                Add Artist
-              </label>
-              <input
-                type="text"
-                value={newArtist.name}
-                onChange={(e) => setNewArtist(prev => ({ ...prev, name: e.target.value }))}
-                style={{
-                  width: '100%',
-                  padding: '0.75rem',
-                  border: '1px solid #ddd',
-                  borderRadius: '4px',
-                  fontSize: '16px'
-                }}
-              />
-              <input
-                type="text"
-                value={newArtist.boardId}
-                onChange={(e) => setNewArtist(prev => ({ ...prev, boardId: e.target.value }))}
-                style={{
-                  width: '100%',
-                  padding: '0.75rem',
-                  border: '1px solid #ddd',
-                  borderRadius: '4px',
-                  fontSize: '16px'
-                }}
-                placeholder="Board ID"
-              />
-              <input
-                type="text"
-                value={newArtist.artistId}
-                onChange={(e) => setNewArtist(prev => ({ ...prev, artistId: e.target.value }))}
-                style={{
-                  width: '100%',
-                  padding: '0.75rem',
-                  border: '1px solid #ddd',
-                  borderRadius: '4px',
-                  fontSize: '16px'
-                }}
-                placeholder="Artist ID"
-              />
-              <select
-                value={newArtist.type}
-                onChange={(e) => setNewArtist(prev => ({ ...prev, type: e.target.value as 'hairstylist' | 'makeup' }))}
-                style={{
-                  width: '100%',
-                  padding: '0.75rem',
-                  border: '1px solid #ddd',
-                  borderRadius: '4px',
-                  fontSize: '16px',
-                  backgroundColor: 'white'
-                }}
-              >
-                <option value="hairstylist">Hairstylist</option>
-                <option value="makeup">Makeup Artist</option>
-              </select>
-              <button
-                onClick={handleAddArtist}
-                style={{
-                  padding: '1rem',
-                  backgroundColor: '#007bff',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '4px',
-                  fontSize: '16px',
-                  fontWeight: 'bold',
-                  cursor: 'pointer',
-                  transition: 'background-color 0.2s'
-                }}
-              >
-                Add Artist
-              </button>
-            </div>
-            <h4 style={{ marginBottom: '1rem', color: '#333' }}>Hairstylists</h4>
-            <ul>
-              {editableHairstylists.map(artist => (
-                <li key={artist}>
-                  {artist}
+            <button
+              onClick={() => setShowArtistManagement(true)}
+              style={{
+                padding: '1rem',
+                backgroundColor: '#007bff',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                fontSize: '16px',
+                fontWeight: 'bold',
+                cursor: 'pointer',
+                transition: 'background-color 0.2s'
+              }}
+            >
+              Manage Artists
+            </button>
+
+            {showArtistManagement && (
+              <div style={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backgroundColor: 'rgba(0,0,0,0.5)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                zIndex: 1000
+              }}>
+                <div style={{
+                  backgroundColor: 'white',
+                  padding: '1.5rem',
+                  borderRadius: '8px',
+                  boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
+                  width: '400px',
+                  maxHeight: '70vh',
+                  overflowY: 'auto'
+                }}>
+                  <h3 style={{ marginBottom: '1rem', color: '#333' }}>Artist Management</h3>
+                  <div>
+                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>
+                      Add Artist
+                    </label>
+                    <input
+                      type="text"
+                      value={newArtist.name}
+                      onChange={(e) => setNewArtist(prev => ({ ...prev, name: e.target.value }))}
+                      style={{
+                        width: '100%',
+                        padding: '0.75rem',
+                        border: '1px solid #ddd',
+                        borderRadius: '4px',
+                        fontSize: '16px'
+                      }}
+                    />
+                    <input
+                      type="text"
+                      value={newArtist.boardId}
+                      onChange={(e) => setNewArtist(prev => ({ ...prev, boardId: e.target.value }))}
+                      style={{
+                        width: '100%',
+                        padding: '0.75rem',
+                        border: '1px solid #ddd',
+                        borderRadius: '4px',
+                        fontSize: '16px'
+                      }}
+                      placeholder="Board ID"
+                    />
+                    <input
+                      type="text"
+                      value={newArtist.artistId}
+                      onChange={(e) => setNewArtist(prev => ({ ...prev, artistId: e.target.value }))}
+                      style={{
+                        width: '100%',
+                        padding: '0.75rem',
+                        border: '1px solid #ddd',
+                        borderRadius: '4px',
+                        fontSize: '16px'
+                      }}
+                      placeholder="Artist ID"
+                    />
+                    <select
+                      value={newArtist.type}
+                      onChange={(e) => setNewArtist(prev => ({ ...prev, type: e.target.value as 'hairstylist' | 'makeup' }))}
+                      style={{
+                        width: '100%',
+                        padding: '0.75rem',
+                        border: '1px solid #ddd',
+                        borderRadius: '4px',
+                        fontSize: '16px',
+                        backgroundColor: 'white'
+                      }}
+                    >
+                      <option value="hairstylist">Hairstylist</option>
+                      <option value="makeup">Makeup Artist</option>
+                    </select>
+                    <button
+                      onClick={handleAddArtist}
+                      style={{
+                        padding: '1rem',
+                        backgroundColor: '#007bff',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '4px',
+                        fontSize: '16px',
+                        fontWeight: 'bold',
+                        cursor: 'pointer',
+                        transition: 'background-color 0.2s'
+                      }}
+                    >
+                      Add Artist
+                    </button>
+                  </div>
+                  <h4 style={{ marginBottom: '1rem', color: '#333' }}>Hairstylists</h4>
+                  <ul>
+                    {editableHairstylists.map(artist => (
+                      <li key={artist}>
+                        {artist}
+                        <button
+                          onClick={() => handleRemoveArtist(artist, 'hairstylist')}
+                          style={{
+                            padding: '0.5rem',
+                            backgroundColor: '#dc3545',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '4px',
+                            fontSize: '14px',
+                            cursor: 'pointer',
+                            transition: 'background-color 0.2s'
+                          }}
+                        >
+                          Remove
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                  <h4 style={{ marginBottom: '1rem', color: '#333' }}>Makeup Artists</h4>
+                  <ul>
+                    {editableMakeupArtists.map(artist => (
+                      <li key={artist}>
+                        {artist}
+                        <button
+                          onClick={() => handleRemoveArtist(artist, 'makeup')}
+                          style={{
+                            padding: '0.5rem',
+                            backgroundColor: '#dc3545',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '4px',
+                            fontSize: '14px',
+                            cursor: 'pointer',
+                            transition: 'background-color 0.2s'
+                          }}
+                        >
+                          Remove
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
                   <button
-                    onClick={() => handleRemoveArtist(artist, 'hairstylist')}
+                    onClick={() => setShowArtistManagement(false)}
                     style={{
-                      padding: '0.5rem',
-                      backgroundColor: '#dc3545',
+                      padding: '0.75rem 1.5rem',
+                      backgroundColor: '#6c757d',
                       color: 'white',
                       border: 'none',
                       borderRadius: '4px',
                       fontSize: '14px',
-                      cursor: 'pointer',
-                      transition: 'background-color 0.2s'
+                      cursor: 'pointer'
                     }}
                   >
-                    Remove
+                    Close
                   </button>
-                </li>
-              ))}
-            </ul>
-            <h4 style={{ marginBottom: '1rem', color: '#333' }}>Makeup Artists</h4>
-            <ul>
-              {editableMakeupArtists.map(artist => (
-                <li key={artist}>
-                  {artist}
-                  <button
-                    onClick={() => handleRemoveArtist(artist, 'makeup')}
-                    style={{
-                      padding: '0.5rem',
-                      backgroundColor: '#dc3545',
-                      color: 'white',
-                      border: 'none',
-                      borderRadius: '4px',
-                      fontSize: '14px',
-                      cursor: 'pointer',
-                      transition: 'background-color 0.2s'
-                    }}
-                  >
-                    Remove
-                  </button>
-                </li>
-              ))}
-            </ul>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
@@ -1207,10 +1265,9 @@ export default function Home() {
               fontSize: '16px',
               fontWeight: 'bold',
               cursor: 'pointer',
-              transition: 'background-color 0.2s'
+              transition: 'background-color 0.2s',
+              marginBottom: '0.5rem'
             }}
-            onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#218838'}
-            onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#28a745'}
           >
             {showEmbedCode ? 'Hide Embed Code' : 'Embed Form'}
           </button>
