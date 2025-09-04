@@ -76,17 +76,39 @@ export default async function handler(
         return res.status(200).json({ configs })
 
       case 'POST':
+        // Test file system access first
+        try {
+          const testFile = path.join(process.cwd(), 'data', 'test-write.json')
+          ensureDataDir()
+          fs.writeFileSync(testFile, JSON.stringify({ test: true }))
+          fs.unlinkSync(testFile) // Clean up test file
+          console.log('File system write test: SUCCESS')
+        } catch (testError) {
+          console.error('File system write test: FAILED', testError)
+          return res.status(500).json({ error: `File system access error: ${testError instanceof Error ? testError.message : 'Unknown error'}` })
+        }
+
         // Save a new configuration
         const { name, config, overwrite = false } = req.body
 
+        console.log('POST request received:', { name, hasConfig: !!config, overwrite })
+
         if (!name || !config) {
+          console.error('Missing required fields:', { name: !!name, config: !!config })
           return res.status(400).json({ error: 'Name and config are required' })
         }
 
         const existingConfigs = loadConfigs()
         const existingIndex = existingConfigs.findIndex(c => c.name === name)
 
+        console.log('Existing configs check:', { 
+          totalConfigs: existingConfigs.length, 
+          existingIndex, 
+          overwrite 
+        })
+
         if (existingIndex >= 0 && !overwrite) {
+          console.log('Configuration name already exists, returning 409')
           return res.status(409).json({ error: 'Configuration name already exists' })
         }
 
@@ -98,16 +120,26 @@ export default async function handler(
         }
 
         if (existingIndex >= 0) {
+          console.log('Updating existing configuration at index:', existingIndex)
           existingConfigs[existingIndex] = savedConfig
         } else {
+          console.log('Adding new configuration')
           existingConfigs.push(savedConfig)
         }
 
-        saveConfigs(existingConfigs)
-        return res.status(200).json({ 
-          message: 'Configuration saved successfully', 
-          config: savedConfig 
-        })
+        try {
+          saveConfigs(existingConfigs)
+          console.log('Configuration saved successfully:', name)
+          return res.status(200).json({ 
+            message: 'Configuration saved successfully', 
+            config: savedConfig 
+          })
+        } catch (saveError) {
+          console.error('Failed to save configuration:', saveError)
+          return res.status(500).json({ 
+            error: `Failed to save configuration: ${saveError instanceof Error ? saveError.message : 'Unknown error'}` 
+          })
+        }
 
       case 'DELETE':
         // Delete a configuration

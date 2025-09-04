@@ -239,6 +239,12 @@ export default function Home() {
         makeupArtists: editableMakeupArtists
       }
 
+      console.log('Attempting to save config:', {
+        name: saveDialog.configName.trim(),
+        overwrite,
+        configToSave
+      })
+
       const response = await fetch('/api/form-configs', {
         method: 'POST',
         headers: {
@@ -252,18 +258,23 @@ export default function Home() {
       })
 
       const data = await response.json()
+      console.log('Save response:', { status: response.status, data })
 
       if (response.ok) {
         alert('Configuration saved successfully!')
         setSaveDialog({ isOpen: false, configName: '', isDuplicate: false })
         loadSavedConfigs() // Refresh the list
       } else if (response.status === 409 && !overwrite) {
-        // Configuration name already exists, but we haven't tried to overwrite yet
-        // The dialog will show the overwrite option
+        // Configuration name already exists, show the duplicate warning
+        console.log('Duplicate detected, showing overwrite option')
+        // The dialog should already show the duplicate warning since isDuplicate is set
+        // Just ensure the user sees the warning
       } else {
+        console.error('Save failed:', data)
         alert(data.error || 'Failed to save configuration')
       }
     } catch (error) {
+      console.error('Network error during save:', error)
       alert('Network error. Please try again.')
     }
   }
@@ -872,7 +883,12 @@ export default function Home() {
                     </button>
                     {saveDialog.isDuplicate && (
                       <button
-                        onClick={() => handleSaveDialogNameChange('')}
+                        onClick={() => setSaveDialog(prev => ({ 
+                          ...prev, 
+                          configName: '', 
+                          isDuplicate: false, 
+                          existingConfigName: undefined 
+                        }))}
                         style={{
                           padding: '0.75rem 1.5rem',
                           backgroundColor: '#28a745',
