@@ -16,6 +16,7 @@ interface WeddingFormData {
   country: string
   hairstylist: string
   makeupArtist: string
+  recordNamePrefix: string
 }
 
 export default async function handler(
@@ -218,7 +219,7 @@ export default async function handler(
 
     const variables = {
       boardId: process.env.MONDAY_BOARD_ID,
-      itemName: `Wedding - ${formData.brideName}`,
+      itemName: `${formData.recordNamePrefix} - ${formData.brideName}`,
       columnValues: JSON.stringify(columnValues)
     }
 
