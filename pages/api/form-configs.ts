@@ -42,7 +42,7 @@ export default async function handler(
             updatedAt: config.updatedAt.toISOString()
           }))
           return res.status(200).json({ configs: formattedConfigs })
-        } catch (error) {
+        } catch (error: any) {
           console.error('Error fetching configs:', error)
           return res.status(500).json({ error: 'Failed to fetch configurations' })
         }
@@ -90,9 +90,9 @@ export default async function handler(
               updatedAt: savedConfig.updatedAt.toISOString()
             }
           })
-        } catch (error) {
+        } catch (error: any) {
           console.error('Failed to save configuration:', error)
-          if (error.code === 11000) {
+          if (error instanceof Error && 'code' in error && error.code === 11000) {
             return res.status(409).json({ error: 'Configuration name already exists' })
           }
           return res.status(500).json({ 
@@ -115,7 +115,7 @@ export default async function handler(
           }
 
           return res.status(200).json({ message: 'Configuration deleted successfully' })
-        } catch (error) {
+        } catch (error: any) {
           console.error('Failed to delete configuration:', error)
           return res.status(500).json({ error: 'Failed to delete configuration' })
         }
@@ -123,7 +123,7 @@ export default async function handler(
       default:
         return res.status(405).json({ error: 'Method not allowed' })
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error('Database connection error:', error)
     return res.status(500).json({ error: 'Database connection failed' })
   }
