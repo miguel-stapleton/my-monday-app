@@ -227,7 +227,11 @@ export default function Home() {
   }
 
   const handleSaveConfig = async (overwrite = false) => {
+    console.log('[Frontend] handleSaveConfig called with overwrite:', overwrite)
+    console.log('[Frontend] saveDialog state:', saveDialog)
+    
     if (!saveDialog.configName.trim()) {
+      console.log('[Frontend] Empty config name, showing alert')
       alert('Please enter a configuration name')
       return
     }
@@ -239,12 +243,13 @@ export default function Home() {
         makeupArtists: editableMakeupArtists
       }
 
-      console.log('Attempting to save config:', {
+      console.log('[Frontend] Attempting to save config:', {
         name: saveDialog.configName.trim(),
         overwrite,
         configToSave
       })
 
+      console.log('[Frontend] Making fetch request to /api/form-configs')
       const response = await fetch('/api/form-configs', {
         method: 'POST',
         headers: {
@@ -257,24 +262,37 @@ export default function Home() {
         }),
       })
 
+      console.log('[Frontend] Fetch response received:', {
+        status: response.status,
+        statusText: response.statusText,
+        ok: response.ok
+      })
+
       const data = await response.json()
-      console.log('Save response:', { status: response.status, data })
+      console.log('[Frontend] Response data:', data)
 
       if (response.ok) {
+        console.log('[Frontend] Save successful')
         alert('Configuration saved successfully!')
         setSaveDialog({ isOpen: false, configName: '', isDuplicate: false })
         loadSavedConfigs() // Refresh the list
       } else if (response.status === 409 && !overwrite) {
         // Configuration name already exists, show the duplicate warning
-        console.log('Duplicate detected, showing overwrite option')
+        console.log('[Frontend] Duplicate detected, showing overwrite option')
         // The dialog should already show the duplicate warning since isDuplicate is set
         // Just ensure the user sees the warning
       } else {
-        console.error('Save failed:', data)
+        console.error('[Frontend] Save failed:', data)
         alert(data.error || 'Failed to save configuration')
       }
     } catch (error) {
-      console.error('Network error during save:', error)
+      console.error('[Frontend] Network error during save:', error)
+      console.error('[Frontend] Error details:', {
+        message: error instanceof Error ? error.message : 'Unknown error',
+        stack: error instanceof Error ? error.stack : undefined,
+        type: typeof error,
+        error: error
+      })
       alert('Network error. Please try again.')
     }
   }
