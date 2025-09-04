@@ -160,7 +160,23 @@ export default function Home() {
         }),
       })
 
-      const data = await response.json()
+      console.log('[Frontend] Fetch response received:', {
+        status: response.status,
+        statusText: response.statusText,
+        ok: response.ok,
+        contentType: response.headers.get('content-type')
+      })
+
+      let data
+      try {
+        data = await response.json()
+        console.log('[Frontend] Response data:', data)
+      } catch (jsonError) {
+        console.error('[Frontend] Failed to parse JSON response:', jsonError)
+        const textResponse = await response.text()
+        console.error('[Frontend] Raw response text:', textResponse)
+        throw new Error(`Server returned non-JSON response (${response.status}): ${response.statusText}`)
+      }
 
       if (response.ok) {
         setSubmitMessage('Thank you for your inquiry.\n\nWe\'ll get back to you ASAP!')
@@ -265,11 +281,20 @@ export default function Home() {
       console.log('[Frontend] Fetch response received:', {
         status: response.status,
         statusText: response.statusText,
-        ok: response.ok
+        ok: response.ok,
+        contentType: response.headers.get('content-type')
       })
 
-      const data = await response.json()
-      console.log('[Frontend] Response data:', data)
+      let data
+      try {
+        data = await response.json()
+        console.log('[Frontend] Response data:', data)
+      } catch (jsonError) {
+        console.error('[Frontend] Failed to parse JSON response:', jsonError)
+        const textResponse = await response.text()
+        console.error('[Frontend] Raw response text:', textResponse)
+        throw new Error(`Server returned non-JSON response (${response.status}): ${response.statusText}`)
+      }
 
       if (response.ok) {
         console.log('[Frontend] Save successful')
