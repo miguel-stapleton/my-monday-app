@@ -168,12 +168,12 @@ export default function Home() {
       })
 
       let data
+      const responseClone = response.clone()
       try {
         data = await response.json()
         console.log('[Frontend] Response data:', data)
       } catch (jsonError) {
         console.error('[Frontend] Failed to parse JSON response:', jsonError)
-        const responseClone = response.clone()
         const textResponse = await responseClone.text()
         console.error('[Frontend] Raw response text:', textResponse)
         throw new Error(`Server returned non-JSON response (${response.status}): ${response.statusText}`)
@@ -214,9 +214,17 @@ export default function Home() {
     try {
       setIsLoadingConfigs(true)
       const response = await fetch('/api/form-configs')
-      const data = await response.json()
-      if (response.ok) {
-        setSavedConfigs(data.configs || [])
+      const responseClone = response.clone()
+      try {
+        const data = await response.json()
+        if (response.ok) {
+          setSavedConfigs(data.configs || [])
+        }
+      } catch (jsonError) {
+        console.error('[Frontend] Failed to parse JSON response:', jsonError)
+        const textResponse = await responseClone.text()
+        console.error('[Frontend] Raw response text:', textResponse)
+        throw new Error(`Server returned non-JSON response (${response.status}): ${response.statusText}`)
       }
     } catch (error) {
       console.error('Error loading configs:', error)
@@ -287,12 +295,12 @@ export default function Home() {
       })
 
       let data
+      const responseClone = response.clone()
       try {
         data = await response.json()
         console.log('[Frontend] Response data:', data)
       } catch (jsonError) {
         console.error('[Frontend] Failed to parse JSON response:', jsonError)
-        const responseClone = response.clone()
         const textResponse = await responseClone.text()
         console.error('[Frontend] Raw response text:', textResponse)
         throw new Error(`Server returned non-JSON response (${response.status}): ${response.statusText}`)
@@ -352,13 +360,20 @@ export default function Home() {
         method: 'DELETE'
       })
 
-      const data = await response.json()
-
-      if (response.ok) {
-        alert('Configuration deleted successfully!')
-        loadSavedConfigs() // Refresh the list
-      } else {
-        alert(data.error || 'Failed to delete configuration')
+      const responseClone = response.clone()
+      try {
+        const data = await response.json()
+        if (response.ok) {
+          alert('Configuration deleted successfully!')
+          loadSavedConfigs() // Refresh the list
+        } else {
+          alert(data.error || 'Failed to delete configuration')
+        }
+      } catch (jsonError) {
+        console.error('[Frontend] Failed to parse JSON response:', jsonError)
+        const textResponse = await responseClone.text()
+        console.error('[Frontend] Raw response text:', textResponse)
+        throw new Error(`Server returned non-JSON response (${response.status}): ${response.statusText}`)
       }
     } catch (error) {
       alert('Network error. Please try again.')
