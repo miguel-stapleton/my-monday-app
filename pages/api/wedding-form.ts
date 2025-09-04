@@ -55,8 +55,26 @@ export default async function handler(
       hasMondayToken: !!process.env.MONDAY_API_TOKEN,
       hasMondayBoard: !!process.env.MONDAY_BOARD_ID,
       mondayTokenLength: process.env.MONDAY_API_TOKEN?.length || 0,
-      mondayBoardId: process.env.MONDAY_BOARD_ID
+      mondayBoardId: process.env.MONDAY_BOARD_ID,
+      tokenStart: process.env.MONDAY_API_TOKEN?.substring(0, 10),
+      tokenEnd: process.env.MONDAY_API_TOKEN?.substring(-10)
     })
+
+    // Test basic Monday.com API access first
+    console.log('Testing Monday.com API access...')
+    const testResponse = await fetch('https://api.monday.com/v2', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${process.env.MONDAY_API_TOKEN}`,
+      },
+      body: JSON.stringify({
+        query: 'query { me { name } }'
+      }),
+    })
+    
+    const testData = await testResponse.json()
+    console.log('Monday.com test response:', testData)
 
     const boardResponse = await fetch('https://api.monday.com/v2', {
       method: 'POST',
