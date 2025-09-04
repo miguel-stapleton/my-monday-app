@@ -173,7 +173,8 @@ export default function Home() {
         console.log('[Frontend] Response data:', data)
       } catch (jsonError) {
         console.error('[Frontend] Failed to parse JSON response:', jsonError)
-        const textResponse = await response.text()
+        const responseClone = response.clone()
+        const textResponse = await responseClone.text()
         console.error('[Frontend] Raw response text:', textResponse)
         throw new Error(`Server returned non-JSON response (${response.status}): ${response.statusText}`)
       }
@@ -291,7 +292,8 @@ export default function Home() {
         console.log('[Frontend] Response data:', data)
       } catch (jsonError) {
         console.error('[Frontend] Failed to parse JSON response:', jsonError)
-        const textResponse = await response.text()
+        const responseClone = response.clone()
+        const textResponse = await responseClone.text()
         console.error('[Frontend] Raw response text:', textResponse)
         throw new Error(`Server returned non-JSON response (${response.status}): ${response.statusText}`)
       }

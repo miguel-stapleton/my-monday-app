@@ -35,7 +35,19 @@ export default async function handler(
   res: NextApiResponse<Data>
 ) {
   console.log(`[form-configs] ${req.method} request received`)
+  console.log(`[form-configs] Request URL: ${req.url}`)
+  console.log(`[form-configs] Headers:`, req.headers)
   
+  // Set CORS headers for Vercel
+  res.setHeader('Access-Control-Allow-Origin', '*')
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS')
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
+  
+  // Handle preflight requests
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end()
+  }
+
   try {
     console.log('[form-configs] Attempting to connect to MongoDB...')
     await connectToDB()
