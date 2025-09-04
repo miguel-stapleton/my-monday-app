@@ -22,6 +22,7 @@ type Data = {
   error?: string
   configs?: SavedConfig[]
   config?: SavedConfig
+  details?: string
 }
 
 export default async function handler(
