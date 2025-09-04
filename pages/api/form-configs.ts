@@ -1,6 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { connectToDB } from '../../lib/mongodb'
-import FormConfig from '../../models/FormConfig'
 
 interface FormConfigData {
   title: string
@@ -25,6 +24,12 @@ type Data = {
   details?: string
 }
 
+// Dynamic import for serverless compatibility
+const getFormConfigModel = async () => {
+  const FormConfig = (await import('../../models/FormConfig')).default
+  return FormConfig
+}
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>
@@ -36,11 +41,13 @@ export default async function handler(
     await connectToDB()
     console.log('[form-configs] MongoDB connection successful')
 
+    const FormConfig = await getFormConfigModel()
+
     switch (req.method) {
       case 'GET':
         try {
           console.log('[form-configs] Fetching configurations from database...')
-          const configs = await FormConfig.find({}).sort({ updatedAt: -1 })
+          const configs = await (await getFormConfigModel()).find({}).sort({ updatedAt: -1 })
           console.log(`[form-configs] Found ${configs.length} configurations`)
           const formattedConfigs = configs.map(config => ({
             name: config.name,
@@ -66,7 +73,7 @@ export default async function handler(
 
         try {
           console.log('[form-configs] Checking for existing configuration...')
-          const existingConfig = await FormConfig.findOne({ name })
+          const existingConfig = await (await getFormConfigModel()).findOne({ name })
 
           console.log('[form-configs] Existing config check:', { 
             existingConfig: !!existingConfig, 
@@ -85,7 +92,7 @@ export default async function handler(
             savedConfig = await existingConfig.save()
           } else {
             console.log('[form-configs] Creating new configuration:', name)
-            savedConfig = await FormConfig.create({ name, config })
+            savedConfig = await (await getFormConfigModel()).create({ name, config })
           }
 
           console.log('[form-configs] Configuration saved successfully:', name)
@@ -117,7 +124,7 @@ export default async function handler(
 
         try {
           console.log('[form-configs] Deleting configuration:', deleteName)
-          const deletedConfig = await FormConfig.findOneAndDelete({ name: deleteName })
+          const deletedConfig = await (await getFormConfigModel()).findOneAndDelete({ name: deleteName })
 
           if (!deletedConfig) {
             return res.status(404).json({ error: 'Configuration not found' })
