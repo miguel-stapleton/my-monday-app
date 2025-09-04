@@ -53,10 +53,14 @@ const loadConfigs = (): SavedConfig[] => {
 const saveConfigs = (configs: SavedConfig[]) => {
   try {
     ensureDataDir()
+    console.log('Attempting to save configs:', configs.length, 'configurations')
     fs.writeFileSync(CONFIGS_FILE, JSON.stringify(configs, null, 2))
+    console.log('Successfully saved configs to:', CONFIGS_FILE)
   } catch (error) {
     console.error('Error saving configs:', error)
-    throw new Error('Failed to save configurations')
+    console.error('Configs file path:', CONFIGS_FILE)
+    console.error('Configs data:', JSON.stringify(configs, null, 2))
+    throw new Error(`Failed to save configurations: ${error instanceof Error ? error.message : 'Unknown error'}`)
   }
 }
 
