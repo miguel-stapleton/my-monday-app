@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { connectToDB } from '../../lib/mongodb'
+import FormConfig from '../../models/FormConfig'
 
 interface FormConfigData {
   title: string
@@ -24,12 +25,6 @@ type Data = {
   details?: string
 }
 
-// Dynamic import for serverless compatibility
-const getFormConfigModel = async () => {
-  const FormConfig = (await import('../../models/FormConfig')).default
-  return FormConfig
-}
-
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>
@@ -52,8 +47,6 @@ export default async function handler(
     console.log('[form-configs] Attempting to connect to MongoDB...')
     await connectToDB()
     console.log('[form-configs] MongoDB connection successful')
-
-    const FormConfig = await getFormConfigModel()
 
     switch (req.method) {
       case 'GET':
