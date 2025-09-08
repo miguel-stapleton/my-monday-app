@@ -7,17 +7,30 @@ type Data = {
 }
 
 interface WeddingFormData {
-  brideName: string
-  email: string
-  weddingDate: string
-  beautyVenue: string
-  description: string
-  beautyServices: string[]
-  country: string
-  hairstylist: string
-  makeupArtist: string
-  recordNamePrefix: string
-}
+  brideName?: string
+  email?: string
+  weddingDate?: string
+  beautyVenue?: string
+  description?: string
+  beautyServices?: string[]
+  country?: string
+  hairstylist?: string
+  makeupArtist?: string
+  recordNamePrefix?: string
+  formType?: string
+  services?: string[]
+  hairstylistChoice?: string
+  hairstylistSelection?: string
+  // Add other custom fields here as needed
+  Miguelchoice?: string
+  Teresachoice?: string
+  Lolachoice?: string
+  HStatus?: string
+  MStatus?: string
+  '2nd e-mail'?: string
+  muaSelection?: string
+  Mdecision?: string
+  Hdecision?: string}
 
 export default async function handler(
   req: NextApiRequest,
@@ -30,11 +43,39 @@ export default async function handler(
   try {
     const formData: WeddingFormData = req.body
 
-    // Validate required fields
-    if (!formData.brideName || !formData.email || !formData.weddingDate || 
-        !formData.beautyVenue || !formData.country || formData.beautyServices.length === 0) {
-      return res.status(400).json({ error: 'Missing required fields' })
+    // Basic validation - only check for essential fields that are always required
+    if (!formData.email) {
+      return res.status(400).json({ error: 'Email is required' })
     }
+
+    // Hairstylist mapping to Monday.com board IDs
+    const hairstylistMapping: { [key: string]: number } = {
+      "Agne Kanapeckaite": 1265638640,
+      "Lília Costa": 1265638655,
+      "Andreia de Matos": 1265638749,
+      "Eric Ribeiro": 1265638755,
+      "Oksana Grybinnyk": 1265969559,
+      "Joana Carvalho": 1909955242,
+      "Olga Hilário": 1909963655
+    }
+
+    // Makeup artist mapping to Monday.com board IDs
+    const muaMapping: { [key: string]: number } = {
+      "Inês Aguiar (founder artist)": 1260830806,
+      "Lola Carvalho (founder artist)": 1260830807,
+      "Teresa Pilkington (founder artist)": 1260830808,
+      "Miguel Stapleton (founder artist)": 1260830809,
+      "Ana Neves (resident artist)": 1260830810,
+      "Ana Roma (resident artist)": 1260830811,
+      "Sara Jogo (resident artist)": 1260830812,
+      "Sofia Monteiro (fresh artist)": 1260830813,
+      "Rita Nunes (fresh artist)": 1260830814,
+      "Filipa Wahnon (fresh artist)": 1260830815
+    }
+
+    // Board IDs for connect_boards functionality
+    const MUA_BOARD_ID = '1260830748' // MUAs board
+    const HS_BOARD_ID = '1265638639'  // HSs board (hairstylists board)
 
     // First, get the board columns to map the correct column IDs
     const boardQuery = `
@@ -88,11 +129,29 @@ export default async function handler(
       }),
     })
 
+    console.log('Board response status:', boardResponse.status)
+    console.log('Board response headers:', Object.fromEntries(boardResponse.headers.entries()))
+
     const boardData = await boardResponse.json()
+    console.log('Board response data:', JSON.stringify(boardData, null, 2))
 
     if (boardData.errors) {
       console.error('Monday.com board query errors:', boardData.errors)
-      return res.status(400).json({ error: 'Failed to fetch board columns', data: boardData.errors })
+      return res.status(400).json({ 
+        error: 'Failed to fetch board columns', 
+        details: boardData.errors,
+        boardId: process.env.MONDAY_BOARD_ID,
+        query: boardQuery
+      })
+    }
+
+    if (!boardData.data || !boardData.data.boards || boardData.data.boards.length === 0) {
+      console.error('No board data returned:', boardData)
+      return res.status(400).json({ 
+        error: 'Board not found or no access', 
+        boardId: process.env.MONDAY_BOARD_ID,
+        data: boardData
+      })
     }
 
     const columns = boardData.data.boards[0]?.columns || []
@@ -125,7 +184,7 @@ export default async function handler(
     if (weddingDateId) columnValues[weddingDateId] = { date: formData.weddingDate }
     if (beautyVenueId) columnValues[beautyVenueId] = formData.beautyVenue
     if (descriptionId) columnValues[descriptionId] = formData.description
-    if (servicesId) {
+    if (servicesId && formData.beautyServices) {
       // For multi-select dropdown, we need to format as labels array
       columnValues[servicesId] = { labels: formData.beautyServices }
     }
@@ -149,38 +208,20 @@ export default async function handler(
 
     // Add conditional logic for hairstylist and makeup artist decisions
     const hdecisionId = 'status2' // Hdecision column ID
-    const hstatusId = 'dup__of_mstatus' // HStatus column ID  
+    const hstatusId = 'dup_of_mstatus' // HStatus column ID  
     const mdecisionId = 'status7' // Mdecision column ID
     const mstatusId = 'project_status' // MStatus column ID
     const muasId = 'connect_boards' // MUAs board relation column ID
     const hsId = 'connect_boards0' // HSs board relation column ID
-
-    // Artist ID mappings
-    const muaMapping: { [key: string]: number } = {
-      'Lola Carvalho (founder artist)': 1260830806,
-      'Teresa Pilkington (founder artist)': 1260830819,
-      'Miguel Stapleton (founder artist)': 1260830830,
-      'Inês Aguiar (founder artist)': 1265637834,
-      'Sofia Monteiro (fresh artist)': 1265637910,
-      'Rita Nunes (fresh artist)': 1555231395,
-      'Filipa Wahnon (fresh artist)': 1909973857,
-      'Ana Neves (resident artist)': 1260830858,
-      'Ana Roma (resident artist)': 1260830847,
-      'Sara Jogo (resident artist)': 1909966794
-    }
-
-    const hairstylistMapping: { [key: string]: number } = {
-      'Agne Kanapeckaite': 1265638640,
-      'Lília Costa': 1265638655,
-      'Andreia de Matos': 1265638749,
-      'Eric Ribeiro': 1265638755,
-      'Oksana Grybinnyk': 1265969559,
-      'Joana Carvalho': 1909955242,
-      'Olga Hilário': 1909963655
-    }
+    
+    // Add support for choice fields
+    const miguelchoiceId = 'status5' // Miguelchoice column ID
+    const teresachoiceId = 'color7' // Teresachoice column ID  
+    const lolachoiceId = 'color0' // Lolachoice column ID
+    const secondEmailId = 'email__1' // 2nd e-mail column ID
 
     // Handle Hair service selection
-    if (formData.beautyServices.includes('Hair') && formData.hairstylist) {
+    if (formData.beautyServices && formData.beautyServices.includes('Hair') && formData.hairstylist) {
       if (formData.hairstylist === "I don't know which hairstylist to choose") {
         if (hdecisionId) {
           columnValues[hdecisionId] = { label: "I don't know which hairstylist to choose!" }
@@ -197,13 +238,13 @@ export default async function handler(
         // }
         // Add the selected hairstylist to HSs field
         if (hsId && hairstylistMapping[formData.hairstylist]) {
-          columnValues[hsId] = { item_ids: [hairstylistMapping[formData.hairstylist]] }
+          columnValues[hsId] = { board_id: HS_BOARD_ID, item_ids: [hairstylistMapping[formData.hairstylist]] }
         }
       }
     }
 
     // Handle Make-up service selection
-    if (formData.beautyServices.includes('Make-up') && formData.makeupArtist) {
+    if (formData.beautyServices && formData.beautyServices.includes('Make-up') && formData.makeupArtist) {
       if (formData.makeupArtist === "I don't know which make-up artist to choose") {
         if (mdecisionId) {
           columnValues[mdecisionId] = { label: "I don't know which make-up artist to choose!" }
@@ -220,10 +261,137 @@ export default async function handler(
         // }
         // Add the selected makeup artist to MUAs field
         if (muasId && muaMapping[formData.makeupArtist]) {
-          columnValues[muasId] = { item_ids: [muaMapping[formData.makeupArtist]] }
+          columnValues[muasId] = { board_id: MUA_BOARD_ID, item_ids: [muaMapping[formData.makeupArtist]] }
         }
       }
     }
+
+    // Handle MUA form hairstylist selection
+    if (formData.hairstylistChoice) {
+      if (formData.hairstylistChoice === 'no, thank you') {
+        if (hstatusId) {
+          columnValues[hstatusId] = { label: "not interested" }
+        }
+      } else if (formData.hairstylistChoice === "I don't know which hairstylist to choose") {
+        if (hstatusId) {
+          columnValues[hstatusId] = { label: "undecided- inquire availabilities" }
+        }
+      } else if (hairstylistMapping[formData.hairstylistChoice]) {
+        // Specific hairstylist selected
+        if (hsId) {
+          columnValues[hsId] = { item_ids: [hairstylistMapping[formData.hairstylistChoice]] }
+        }
+        if (hstatusId) {
+          columnValues[hstatusId] = { label: "Travelling fee + inquire artist" }
+        }
+      }
+    }
+
+    // Handle Mdecision and Hdecision fields for MUA forms
+    if (formData.Mdecision) {
+      const mdecisionId = 'status7' // Mdecision column ID
+      columnValues[mdecisionId] = { label: formData.Mdecision }
+    }
+
+    if (formData.Hdecision) {
+      const hdecisionId = 'status2' // Hdecision column ID
+      columnValues[hdecisionId] = { label: formData.Hdecision }
+    }
+    // Handle MUA form artist choice columns
+    if (formData.Lolachoice) {
+      const lolachoiceId = 'color0' // Lola's choice column ID
+      if (lolachoiceId) {
+        columnValues[lolachoiceId] = { label: formData.Lolachoice }
+      }
+    }
+
+    if (formData.Teresachoice) {
+      const teresachoiceId = 'color7' // Teresa's choice column ID  
+      if (teresachoiceId) {
+        columnValues[teresachoiceId] = { label: formData.Teresachoice }
+      }
+    }
+
+    if (formData.Miguelchoice) {
+      const miguelchoiceId = 'status5' // Miguel's choice column ID
+      if (miguelchoiceId) {
+        columnValues[miguelchoiceId] = { label: formData.Miguelchoice }
+      }
+    }
+
+    // Handle MUA form MStatus
+    if (formData.MStatus) {
+      const mstatusId = 'project_status' // MStatus column ID
+      if (mstatusId) {
+        columnValues[mstatusId] = { label: formData.MStatus }
+      }
+    }
+
+    // Handle MUA form connect_boards (MUAs column)
+    if (formData.muaSelection && formData.muaSelection.match(/^\d+$/)) {
+      // If muaSelection is an ID (numeric string), use it for connect_boards
+      const muasId = 'connect_boards' // MUAs column ID
+      if (muasId) {
+        columnValues[muasId] = { item_ids: [parseInt(formData.muaSelection)] }
+      }
+    }
+
+    // Handle all custom Monday.com fields dynamically
+    Object.keys(formData).forEach(fieldKey => {
+      const fieldValue = formData[fieldKey as keyof typeof formData]
+      if (!fieldValue) return
+
+      // Map custom fields to their Monday column IDs
+      switch (fieldKey) {
+        case 'project_status':
+        case 'MStatus':
+          if (mstatusId && fieldValue) {
+            columnValues[mstatusId] = { label: fieldValue }
+          }
+          break
+        case 'dup_of_mstatus':  
+        case 'HStatus':
+          if (hstatusId && fieldValue) {
+            columnValues[hstatusId] = { label: fieldValue }
+          }
+          break
+        case 'status5':
+        case 'Miguelchoice':
+          if (miguelchoiceId && fieldValue) {
+            columnValues[miguelchoiceId] = { label: fieldValue }
+          }
+          break
+        case 'color7':
+        case 'Teresachoice':
+          if (teresachoiceId && fieldValue) {
+            columnValues[teresachoiceId] = { label: fieldValue }
+          }
+          break
+        case 'color0':
+        case 'Lolachoice':
+          if (lolachoiceId && fieldValue) {
+            columnValues[lolachoiceId] = { label: fieldValue }
+          }
+          break
+        case 'email__1':
+        case '2nd e-mail':
+          if (secondEmailId && fieldValue) {
+            columnValues[secondEmailId] = { email: fieldValue, text: fieldValue }
+          }
+          break
+      }
+    })
+
+    console.log('[DEBUG] Column values being sent to Monday.com:', JSON.stringify(columnValues, null, 2))
+    console.log('[DEBUG] Column IDs found:', {
+      mstatusId,
+      hstatusId,
+      hsId,
+      muasId: 'connect_boards',
+      miguelChoiceId: 'status5',
+      lolaChoiceId: 'color0',
+      teresaChoiceId: 'color7'
+    })
 
     console.log('Column mappings:', {
       brideNameId, emailId, weddingDateId, beautyVenueId, 
