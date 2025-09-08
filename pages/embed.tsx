@@ -15,6 +15,12 @@ interface FormData {
   // MUA form specific fields
   hairstylistChoice?: string
   muaSelection?: string
+  // Additional fields for submission
+  services?: string[]
+  HStatus?: string
+  MStatus?: string
+  Mdecision?: string
+  Hdecision?: string
 }
 
 interface FormConfig {
