@@ -688,9 +688,9 @@ export default function Home() {
   const handleServiceChange = (service: string, checked: boolean) => {
     setFormData(prev => ({
       ...prev,
-      beautyServices: checked
-        ? [...prev.beautyServices, service]
-        : prev.beautyServices.filter(s => s !== service),
+      services: checked
+        ? [...prev.services, service]
+        : prev.services.filter(s => s !== service),
       // Reset hairstylist if Hair is unchecked
       hairstylist: checked || service !== 'Hair' ? prev.hairstylist : ''
     }))
@@ -701,18 +701,18 @@ export default function Home() {
     
     // Validation for Inquiry form only
     if (currentFormType === 'inquiry') {
-      if (!formData.beautyServices || formData.beautyServices.length === 0) {
+      if (!formData.services || formData.services.length === 0) {
         setSubmitError('Please select at least one beauty service')
         return
       }
 
       // Validate hairstylist selection if Hair is selected
-      if (formData.beautyServices && formData.beautyServices.includes('Hair') && !formData.hairstylist) {
+      if (formData.services && formData.services.includes('Hair') && !formData.hairstylist) {
         setSubmitError('Please select a hairstylist when Hair service is chosen')
         return
       }
 
-      if (formData.beautyServices && formData.beautyServices.includes('Make-up') && !formData.makeupArtist) {
+      if (formData.services && formData.services.includes('Make-up') && !formData.makeupArtist) {
         setSubmitError('Please select a makeup artist when Make-up service is chosen')
         return
       }
@@ -1314,10 +1314,10 @@ export default function Home() {
               {formConfigs[currentFormType].fields.filter(field => !field.invisible && field.enabled).map(field => {
                 // Special handling for conditional fields (inquiry form only)
                 if (currentFormType === 'inquiry') {
-                  if (field.id === 'hairstylist' && (!formData.beautyServices || !formData.beautyServices.includes('Hair'))) {
+                  if (field.id === 'hairstylist' && (!formData.services || !formData.services.includes('Hair'))) {
                     return null
                   }
-                  if (field.id === 'makeupArtist' && (!formData.beautyServices || !formData.beautyServices.includes('Make-up'))) {
+                  if (field.id === 'makeupArtist' && (!formData.services || !formData.services.includes('Make-up'))) {
                     return null
                   }
                 }
@@ -1442,11 +1442,11 @@ export default function Home() {
                         {field.mondayColumnType === 'connect_boards' && (
                           (field.mondayColumn === 'connect_boards0' && boardItems['1260998854']) || 
                           (field.mondayColumn === 'connect_boards' && boardItems['1260830748']) ||
-                          boardItems[field.mondayColumn]
+                          (field.mondayColumn && boardItems[field.mondayColumn])
                         ) && (
                           (field.mondayColumn === 'connect_boards0' ? boardItems['1260998854'] : 
                            field.mondayColumn === 'connect_boards' ? boardItems['1260830748'] : 
-                           boardItems[field.mondayColumn])
+                           field.mondayColumn ? boardItems[field.mondayColumn] : [])
                         ).map(item => (
                           <option key={item.id} value={item.id}>
                             {item.name}
