@@ -128,6 +128,15 @@ export default function EmbedForm() {
   // Load configuration if specified in URL
   useEffect(() => {
     const loadConfig = async () => {
+      // Set default config based on form type first
+      if (currentFormType === 'mua') {
+        setFormConfig({
+          title: 'MUA Application Form',
+          subtitle: 'Apply to work with our beauty team',
+          recordNamePrefix: 'MUA Application'
+        })
+      }
+
       if (configName && typeof configName === 'string') {
         try {
           const response = await fetch('/api/form-configs')
@@ -146,15 +155,6 @@ export default function EmbedForm() {
           }
         } catch (error) {
           console.error('Error loading config:', error)
-        }
-      } else {
-        // Set default config based on form type
-        if (currentFormType === 'mua') {
-          setFormConfig({
-            title: 'MUA Application Form',
-            subtitle: 'Apply to work with our beauty team',
-            recordNamePrefix: 'MUA Application'
-          })
         }
       }
       setIsLoading(false)
