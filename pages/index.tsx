@@ -452,8 +452,8 @@ const defaultMuaFormFields: FormField[] = [
   {
     id: 'hairstylistChoice',
     label: 'DoesSheWantHair?',
-    title: '(Artist Name) does make-up only. Did you like any hairstylist in specific?',
-    subtitle: 'This artist does make-up only. Did you like any hairstylist in specific?',
+    title: 'This artist does make-up only. Did you like any hairstylist in specific?',
+    subtitle: 'Select if you would like hairstyling services in addition to makeup',
     type: 'select',
     required: true,
     enabled: true,
