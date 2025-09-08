@@ -1,4 +1,5 @@
-const { NextApiRequest, NextApiResponse } = require('next')
+import type { NextApiRequest, NextApiResponse } from 'next'
+import mongoose from 'mongoose'
 
 interface FormConfigData {
   title: string
@@ -23,13 +24,43 @@ type Data = {
   details?: string
 }
 
+// Define schema inline for Vercel compatibility
+const formConfigSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: true,
+    unique: true,
+    trim: true
+  },
+  config: {
+    title: {
+      type: String,
+      required: true
+    },
+    subtitle: {
+      type: String,
+      required: true
+    },
+    recordNamePrefix: {
+      type: String,
+      required: true
+    },
+    hairstylists: [{
+      type: String
+    }],
+    makeupArtists: [{
+      type: String
+    }]
+  }
+}, { 
+  timestamps: true 
+})
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>
 ) {
   console.log(`[form-configs] ${req.method} request received`)
-  console.log(`[form-configs] Request URL: ${req.url}`)
-  console.log(`[form-configs] Headers:`, req.headers)
   
   // Set CORS headers for Vercel
   res.setHeader('Access-Control-Allow-Origin', '*')
@@ -42,13 +73,26 @@ export default async function handler(
   }
 
   try {
-    // Use require() for better serverless compatibility
-    const { connectToDB } = require('../../lib/mongodb')
-    const FormConfig = require('../../models/FormConfig').default
+    // Direct MongoDB connection for Vercel
+    const mongoUri = process.env.MONGODB_URI
+    const mongoDb = process.env.MONGODB_DB
 
-    console.log('[form-configs] Attempting to connect to MongoDB...')
-    await connectToDB()
-    console.log('[form-configs] MongoDB connection successful')
+    if (!mongoUri || !mongoDb) {
+      console.error('[form-configs] Missing MongoDB environment variables')
+      return res.status(500).json({ error: 'MongoDB configuration missing' })
+    }
+
+    console.log('[form-configs] Connecting to MongoDB directly...')
+    
+    // Use direct mongoose connection
+    if (mongoose.connection.readyState !== 1) {
+      await mongoose.connect(mongoUri, { dbName: mongoDb })
+    }
+    
+    console.log('[form-configs] MongoDB connected successfully')
+
+    // Get or create model inline
+    const FormConfig = mongoose.models.FormConfig || mongoose.model('FormConfig', formConfigSchema)
 
     switch (req.method) {
       case 'GET':
@@ -56,7 +100,7 @@ export default async function handler(
           console.log('[form-configs] Fetching configurations from database...')
           const configs = await FormConfig.find({}).sort({ updatedAt: -1 })
           console.log(`[form-configs] Found ${configs.length} configurations`)
-          const formattedConfigs = configs.map(config => ({
+          const formattedConfigs = configs.map((config: any) => ({
             name: config.name,
             config: config.config,
             createdAt: config.createdAt.toISOString(),
@@ -148,16 +192,10 @@ export default async function handler(
         return res.status(405).json({ error: 'Method not allowed' })
     }
   } catch (error: any) {
-    console.error('[form-configs] Database connection error:', error)
-    console.error('[form-configs] Error details:', {
-      message: error.message,
-      stack: error.stack,
-      mongoUri: process.env.MONGODB_URI ? 'Set' : 'Not set',
-      mongoDb: process.env.MONGODB_DB ? 'Set' : 'Not set'
-    })
+    console.error('[form-configs] Critical MongoDB error:', error)
     return res.status(500).json({ 
-      error: `Database connection failed: ${error.message || 'Unknown error'}`,
-      details: process.env.NODE_ENV === 'development' ? error.message : undefined
+      error: `MongoDB connection failed: ${error.message || 'Unknown error'}`,
+      details: process.env.NODE_ENV === 'development' ? error.stack : undefined
     })
   }
 }
