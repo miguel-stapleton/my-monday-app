@@ -139,7 +139,6 @@ export default async function handler(
       console.error('Monday.com board query errors:', boardData.errors)
       return res.status(400).json({ 
         error: 'Failed to fetch board columns', 
-        details: boardData.errors,
         boardId: process.env.MONDAY_BOARD_ID,
         query: boardQuery
       })
