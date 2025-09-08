@@ -228,7 +228,9 @@ export default function EmbedForm() {
           // Specific hairstylist chosen
           submissionData.services = ['Make-up', 'Hair']
           submissionData.HStatus = 'Travelling fee + inquire artist'
-          submissionData.hairstylist = hairstylistChoice
+          if (hairstylistChoice) {
+            submissionData.hairstylist = hairstylistChoice
+          }
         }
 
         // Set MUA specific fields
