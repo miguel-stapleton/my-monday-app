@@ -138,18 +138,14 @@ export default async function handler(
     if (boardData.errors) {
       console.error('Monday.com board query errors:', boardData.errors)
       return res.status(400).json({ 
-        error: 'Failed to fetch board columns', 
-        boardId: process.env.MONDAY_BOARD_ID,
-        query: boardQuery
+        error: 'Failed to fetch board columns'
       })
     }
 
     if (!boardData.data || !boardData.data.boards || boardData.data.boards.length === 0) {
       console.error('No board data returned:', boardData)
       return res.status(400).json({ 
-        error: 'Board not found or no access', 
-        boardId: process.env.MONDAY_BOARD_ID,
-        data: boardData
+        error: 'Board not found or no access'
       })
     }
 
@@ -433,7 +429,7 @@ export default async function handler(
 
     if (data.errors) {
       console.error('Monday.com API errors:', data.errors)
-      return res.status(400).json({ error: 'Failed to create Monday.com item', data: data.errors })
+      return res.status(400).json({ error: 'Failed to create Monday.com item' })
     }
 
     res.status(200).json({ 
