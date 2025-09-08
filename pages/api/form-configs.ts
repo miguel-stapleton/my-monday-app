@@ -1,5 +1,4 @@
-import type { NextApiRequest, NextApiResponse } from 'next'
-import { connectToDB } from '../../lib/mongodb'
+const { NextApiRequest, NextApiResponse } = require('next')
 
 interface FormConfigData {
   title: string
@@ -43,14 +42,13 @@ export default async function handler(
   }
 
   try {
+    // Use require() for better serverless compatibility
+    const { connectToDB } = require('../../lib/mongodb')
+    const FormConfig = require('../../models/FormConfig').default
+
     console.log('[form-configs] Attempting to connect to MongoDB...')
     await connectToDB()
     console.log('[form-configs] MongoDB connection successful')
-
-    // Dynamic import for Vercel serverless compatibility
-    console.log('[form-configs] Loading FormConfig model...')
-    const { default: FormConfig } = await import('../../models/FormConfig')
-    console.log('[form-configs] FormConfig model loaded successfully')
 
     switch (req.method) {
       case 'GET':
