@@ -12,6 +12,9 @@ interface FormData {
   country: string
   hairstylist: string
   makeupArtist: string
+  // MUA form specific fields
+  hairstylistChoice?: string
+  muaSelection?: string
 }
 
 interface FormConfig {
@@ -29,6 +32,8 @@ interface SavedConfig {
   createdAt: string
   updatedAt: string
 }
+
+type FormType = 'inquiry' | 'mua'
 
 const countries = [
   'Afghanistan', 'Albania', 'Algeria', 'Argentina', 'Australia', 'Austria',
@@ -65,10 +70,23 @@ const defaultMakeupArtists = [
   "Filipa Wahnon (fresh artist)"
 ]
 
+const muaHairstylistOptions = [
+  'no, thank you',
+  "I don't know which hairstylist to choose",
+  'Agne Kanapeckaite',
+  'Lília Costa',
+  'Andreia de Matos',
+  'Eric Ribeiro',
+  'Oksana Grybinnyk',
+  'Joana Carvalho',
+  'Olga Hilário'
+]
+
 export default function EmbedForm() {
   const router = useRouter()
-  const { config: configName } = router.query
+  const { config: configName, formType } = router.query
 
+  const [currentFormType, setCurrentFormType] = useState<FormType>('inquiry')
   const [formData, setFormData] = useState<FormData>({
     brideName: '',
     email: '',
@@ -78,7 +96,9 @@ export default function EmbedForm() {
     beautyServices: [],
     country: '',
     hairstylist: '',
-    makeupArtist: ''
+    makeupArtist: '',
+    hairstylistChoice: '',
+    muaSelection: ''
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitMessage, setSubmitMessage] = useState('')
@@ -91,6 +111,13 @@ export default function EmbedForm() {
   const [hairstylists, setHairstylists] = useState(defaultHairstylists)
   const [makeupArtists, setMakeupArtists] = useState(defaultMakeupArtists)
   const [isLoading, setIsLoading] = useState(true)
+
+  // Set form type from URL parameter
+  useEffect(() => {
+    if (formType && (formType === 'inquiry' || formType === 'mua')) {
+      setCurrentFormType(formType as FormType)
+    }
+  }, [formType])
 
   // Load configuration if specified in URL
   useEffect(() => {
@@ -114,12 +141,21 @@ export default function EmbedForm() {
         } catch (error) {
           console.error('Error loading config:', error)
         }
+      } else {
+        // Set default config based on form type
+        if (currentFormType === 'mua') {
+          setFormConfig({
+            title: 'MUA Application Form',
+            subtitle: 'Apply to work with our beauty team',
+            recordNamePrefix: 'MUA Application'
+          })
+        }
       }
       setIsLoading(false)
     }
 
     loadConfig()
-  }, [configName])
+  }, [configName, currentFormType])
 
   const handleInputChange = (field: keyof FormData, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }))
@@ -139,20 +175,29 @@ export default function EmbedForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
-    if (formData.beautyServices.length === 0) {
-      setSubmitError('Please select at least one beauty service')
-      return
-    }
+    // Validation based on form type
+    if (currentFormType === 'inquiry') {
+      if (formData.beautyServices.length === 0) {
+        setSubmitError('Please select at least one beauty service')
+        return
+      }
 
-    // Validate hairstylist selection if Hair is selected
-    if (formData.beautyServices.includes('Hair') && !formData.hairstylist) {
-      setSubmitError('Please select a hairstylist when Hair service is chosen')
-      return
-    }
+      // Validate hairstylist selection if Hair is selected
+      if (formData.beautyServices.includes('Hair') && !formData.hairstylist) {
+        setSubmitError('Please select a hairstylist when Hair service is chosen')
+        return
+      }
 
-    if (formData.beautyServices.includes('Make-up') && !formData.makeupArtist) {
-      setSubmitError('Please select a makeup artist when Make-up service is chosen')
-      return
+      if (formData.beautyServices.includes('Make-up') && !formData.makeupArtist) {
+        setSubmitError('Please select a makeup artist when Make-up service is chosen')
+        return
+      }
+    } else if (currentFormType === 'mua') {
+      // MUA form validation
+      if (!formData.hairstylistChoice) {
+        setSubmitError('Please select your hairstylist preference')
+        return
+      }
     }
 
     setIsSubmitting(true)
@@ -160,21 +205,59 @@ export default function EmbedForm() {
     setSubmitMessage('')
 
     try {
+      let submissionData = { ...formData }
+      
+      // Handle MUA form specific logic
+      if (currentFormType === 'mua') {
+        // Handle hairstylist choice logic
+        const hairstylistChoice = formData.hairstylistChoice
+        
+        if (hairstylistChoice === 'no, thank you') {
+          submissionData.services = ['Make-up']
+          submissionData.HStatus = 'not interested'
+        } else if (hairstylistChoice === "I don't know which hairstylist to choose") {
+          submissionData.services = ['Make-up', 'Hair']
+          submissionData.HStatus = 'undecided- inquire availabilities'
+        } else {
+          // Specific hairstylist chosen
+          submissionData.services = ['Make-up', 'Hair']
+          submissionData.HStatus = 'Travelling fee + inquire artist'
+          submissionData.hairstylist = hairstylistChoice
+        }
+
+        // Set MUA specific fields
+        submissionData.Mdecision = 'let me choose a specific make-up artist'
+        submissionData.MStatus = 'Direct choice'
+        
+        // Set Hdecision based on hairstylist choice
+        if (hairstylistChoice === 'no, thank you') {
+          submissionData.Hdecision = '(not interested)'
+        } else if (hairstylistChoice === "I don't know which hairstylist to choose") {
+          submissionData.Hdecision = "I don't know which hairstylist to choose!"
+        } else {
+          submissionData.Hdecision = 'let me choose a specific hairstylist'
+        }
+      }
+
       const response = await fetch('/api/wedding-form', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          ...formData,
-          recordNamePrefix: formConfig.recordNamePrefix
+          ...submissionData,
+          recordNamePrefix: formConfig.recordNamePrefix,
+          formType: currentFormType
         }),
       })
 
       const data = await response.json()
 
       if (response.ok) {
-        setSubmitMessage('Thank you for your inquiry.\n\nWe\'ll get back to you ASAP!')
+        const successMessage = currentFormType === 'inquiry' 
+          ? 'Thank you for your inquiry.\n\nWe\'ll get back to you ASAP!'
+          : 'Thank you for your application.\n\nWe\'ll review your submission and get back to you soon!'
+        setSubmitMessage(successMessage)
         // Reset form
         setFormData({
           brideName: '',
@@ -185,7 +268,9 @@ export default function EmbedForm() {
           beautyServices: [],
           country: '',
           hairstylist: '',
-          makeupArtist: ''
+          makeupArtist: '',
+          hairstylistChoice: '',
+          muaSelection: ''
         })
       } else {
         setSubmitError(data.error || 'Failed to submit form')
@@ -371,79 +456,121 @@ export default function EmbedForm() {
               </p>
             </div>
 
-            <div>
-              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>
-                Beauty Services *
-              </label>
-              <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-                {['Hair', 'Make-up'].map(service => (
-                  <label key={service} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <input
-                      type="checkbox"
-                      checked={formData.beautyServices.includes(service)}
-                      onChange={(e) => handleServiceChange(service, e.target.checked)}
-                      style={{ transform: 'scale(1.2)' }}
-                    />
-                    {service}
+            {/* Inquiry Form Fields */}
+            {currentFormType === 'inquiry' && (
+              <>
+                <div>
+                  <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>
+                    Beauty Services *
                   </label>
-                ))}
-              </div>
-              <p style={{ 
-                fontSize: '12px', 
-                color: '#666', 
-                marginTop: '0.25rem', 
-                marginBottom: '0' 
-              }}>
-                Which service(s) will you be needing for your wedding?
-              </p>
-            </div>
+                  <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+                    {['Hair', 'Make-up'].map(service => (
+                      <label key={service} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <input
+                          type="checkbox"
+                          checked={formData.beautyServices.includes(service)}
+                          onChange={(e) => handleServiceChange(service, e.target.checked)}
+                          style={{ transform: 'scale(1.2)' }}
+                        />
+                        {service}
+                      </label>
+                    ))}
+                  </div>
+                  <p style={{ 
+                    fontSize: '12px', 
+                    color: '#666', 
+                    marginTop: '0.25rem', 
+                    marginBottom: '0' 
+                  }}>
+                    Which service(s) will you be needing for your wedding?
+                  </p>
+                </div>
 
-            {/* Conditional Hairstylist Selection */}
-            {formData.beautyServices.includes('Hair') && (
-              <div>
-                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>
-                  Who would you like your hairstylist to be? *
-                </label>
-                <select
-                  value={formData.hairstylist}
-                  onChange={(e) => handleInputChange('hairstylist', e.target.value)}
-                  required
-                  style={{
-                    width: '100%',
-                    padding: '0.75rem',
-                    border: '1px solid #ddd',
-                    borderRadius: '4px',
-                    fontSize: '16px',
-                    backgroundColor: 'white'
-                  }}
-                >
-                  <option value="">Please select a hairstylist</option>
-                  {hairstylists.map(stylist => (
-                    <option key={stylist} value={stylist}>
-                      {stylist}
-                    </option>
-                  ))}
-                </select>
-                <p style={{ 
-                  fontSize: '12px', 
-                  color: '#666', 
-                  marginTop: '0.25rem', 
-                  marginBottom: '0' 
-                }}>
-                  Please select one of our hairstylists.
-                </p>
-              </div>
+                {/* Conditional Hairstylist Selection */}
+                {formData.beautyServices.includes('Hair') && (
+                  <div>
+                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>
+                      Who would you like your hairstylist to be? *
+                    </label>
+                    <select
+                      value={formData.hairstylist}
+                      onChange={(e) => handleInputChange('hairstylist', e.target.value)}
+                      required
+                      style={{
+                        width: '100%',
+                        padding: '0.75rem',
+                        border: '1px solid #ddd',
+                        borderRadius: '4px',
+                        fontSize: '16px',
+                        backgroundColor: 'white'
+                      }}
+                    >
+                      <option value="">Please select a hairstylist</option>
+                      {hairstylists.map(stylist => (
+                        <option key={stylist} value={stylist}>
+                          {stylist}
+                        </option>
+                      ))}
+                    </select>
+                    <p style={{ 
+                      fontSize: '12px', 
+                      color: '#666', 
+                      marginTop: '0.25rem', 
+                      marginBottom: '0' 
+                    }}>
+                      Please select one of our hairstylists.
+                    </p>
+                  </div>
+                )}
+
+                {/* Conditional Makeup Artist Selection */}
+                {formData.beautyServices.includes('Make-up') && (
+                  <div>
+                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>
+                      Who would you like your makeup artist to be? *
+                    </label>
+                    <select
+                      value={formData.makeupArtist}
+                      onChange={(e) => handleInputChange('makeupArtist', e.target.value)}
+                      required
+                      style={{
+                        width: '100%',
+                        padding: '0.75rem',
+                        border: '1px solid #ddd',
+                        borderRadius: '4px',
+                        fontSize: '16px',
+                        backgroundColor: 'white'
+                      }}
+                    >
+                      <option value="">Please select a makeup artist</option>
+                      {makeupArtists.map(artist => (
+                        <option key={artist} value={artist}>
+                          {artist}
+                        </option>
+                      ))}
+                    </select>
+                    <p style={{ 
+                      fontSize: '12px', 
+                      color: '#666', 
+                      marginTop: '0.25rem', 
+                      marginBottom: '0' 
+                    }}>
+                      Please select one of our makeup artists.
+                    </p>
+                  </div>
+                )}
+              </>
             )}
 
-            {/* Conditional Makeup Artist Selection */}
-            {formData.beautyServices.includes('Make-up') && (
+            {/* MUA Form Fields */}
+            {currentFormType === 'mua' && (
               <div>
                 <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>
-                  Who would you like your makeup artist to be? *
+                  This artist does make-up only. Did you like any hairstylist in specific? *
                 </label>
                 <select
-                  value={formData.makeupArtist}
-                  onChange={(e) => handleInputChange('makeupArtist', e.target.value)}
+                  value={formData.hairstylistChoice}
+                  onChange={(e) => handleInputChange('hairstylistChoice', e.target.value)}
                   required
                   style={{
                     width: '100%',
@@ -454,10 +581,10 @@ export default function EmbedForm() {
                     backgroundColor: 'white'
                   }}
                 >
-                  <option value="">Please select a makeup artist</option>
-                  {makeupArtists.map(artist => (
-                    <option key={artist} value={artist}>
-                      {artist}
+                  <option value="">Please select an option</option>
+                  {muaHairstylistOptions.map(option => (
+                    <option key={option} value={option}>
+                      {option}
                     </option>
                   ))}
                 </select>
@@ -467,7 +594,7 @@ export default function EmbedForm() {
                   marginTop: '0.25rem', 
                   marginBottom: '0' 
                 }}>
-                  Please select one of our makeup artists.
+                  Select if you would like hairstyling services in addition to makeup
                 </p>
               </div>
             )}
@@ -549,7 +676,7 @@ export default function EmbedForm() {
                 transition: 'background-color 0.2s'
               }}
             >
-              {isSubmitting ? 'Submitting...' : 'Submit Beauty info'}
+              {isSubmitting ? 'Submitting...' : (currentFormType === 'inquiry' ? 'Submit Beauty info' : 'Submit Application')}
             </button>
           </form>
 

@@ -2148,7 +2148,7 @@ export default function Home() {
 <iframe
 width="900"
 height="1600"
-src="${typeof window !== 'undefined' ? window.location.origin : 'https://your-domain.com'}/embed${selectedEmbedConfig ? `?config=${encodeURIComponent(selectedEmbedConfig)}` : ''}">
+src="${typeof window !== 'undefined' ? window.location.origin : 'https://your-domain.com'}/embed${selectedEmbedConfig ? `?config=${encodeURIComponent(selectedEmbedConfig)}` : ''}${selectedEmbedConfig ? '&' : '?'}formType=${currentFormType}">
 </iframe>
 </div>`}</code>
               </div>
@@ -2158,7 +2158,7 @@ src="${typeof window !== 'undefined' ? window.location.origin : 'https://your-do
 <iframe
 width="900"
 height="1600"
-src="${typeof window !== 'undefined' ? window.location.origin : 'https://your-domain.com'}/embed${selectedEmbedConfig ? `?config=${encodeURIComponent(selectedEmbedConfig)}` : ''}">
+src="${typeof window !== 'undefined' ? window.location.origin : 'https://your-domain.com'}/embed${selectedEmbedConfig ? `?config=${encodeURIComponent(selectedEmbedConfig)}` : ''}${selectedEmbedConfig ? '&' : '?'}formType=${currentFormType}">
 </iframe>
 </div>`
                   navigator.clipboard.writeText(embedCode)
