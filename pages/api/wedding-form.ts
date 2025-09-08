@@ -198,7 +198,7 @@ export default async function handler(
         'Sweden': 'SE', 'Switzerland': 'CH', 'Thailand': 'TH', 'Turkey': 'TR',
         'Ukraine': 'UA', 'United Kingdom': 'GB', 'United States': 'US', 'Vietnam': 'VN'
       }
-      columnValues[countryId] = { countryCode: countryMap[formData.country] || 'US' }
+      columnValues[countryId] = { countryCode: countryMap[formData.country || ''] || 'US' }
     }
 
     // Add conditional logic for hairstylist and makeup artist decisions
