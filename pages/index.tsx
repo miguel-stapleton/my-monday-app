@@ -1016,10 +1016,16 @@ export default function Home() {
         // Sync selectedMUAArtist state for MUA forms
         if (currentFormType === 'mua') {
           const muaField = fieldsToUse.find(f => f.id === 'muaSelection')
+          console.log('[DEBUG] Loading MUA config - muaField:', muaField)
+          console.log('[DEBUG] Available muaArtistOptions:', muaArtistOptions)
+          
           if (muaField?.preselectedValue) {
+            console.log('[DEBUG] Looking for artistId:', muaField.preselectedValue)
             const artistConfig = muaArtistOptions.find(artist => artist.artistId === muaField.preselectedValue)
+            console.log('[DEBUG] Found artistConfig:', artistConfig)
             setSelectedMUAArtist(artistConfig || null)
           } else {
+            console.log('[DEBUG] No preselectedValue found, setting to null')
             setSelectedMUAArtist(null)
           }
         }
@@ -2084,12 +2090,17 @@ src="${typeof window !== 'undefined' ? window.location.origin : 'https://your-do
                           value={(() => {
                             const muaField = formConfigs[currentFormType]?.fields?.find(f => f.id === 'muaSelection');
                             const artistId = muaField?.preselectedValue || '';
+                            console.log('[DEBUG] Dropdown render - artistId:', artistId);
                             // Find artist name by artistId for display
                             const artist = muaArtistOptions.find(a => a.artistId === artistId);
-                            return artist?.artistName || '';
+                            console.log('[DEBUG] Dropdown render - found artist:', artist);
+                            const displayValue = artist?.artistName || '';
+                            console.log('[DEBUG] Dropdown render - displaying:', displayValue);
+                            return displayValue;
                           })()}
                           onChange={(e) => {
                             const selectedArtistName = e.target.value
+                            console.log('[DEBUG] Dropdown onChange - selected:', selectedArtistName);
                             // Use the existing handleMUAArtistSelection function which properly syncs all states
                             handleMUAArtistSelection(selectedArtistName)
                           }}

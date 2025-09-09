@@ -99,12 +99,22 @@ export default async function handler(
       mondayBoardId: process.env.MONDAY_BOARD_ID,
       boardIdType: typeof process.env.MONDAY_BOARD_ID,
       tokenStart: process.env.MONDAY_API_TOKEN?.substring(0, 10),
-      tokenEnd: process.env.MONDAY_API_TOKEN?.substring(-10)
+      tokenEnd: process.env.MONDAY_API_TOKEN?.substring(-10),
+      tokenExists: !!process.env.MONDAY_API_TOKEN,
+      tokenIsString: typeof process.env.MONDAY_API_TOKEN === 'string'
     })
+
+    // Validate Monday.com token
+    const mondayToken = process.env.MONDAY_API_TOKEN
+    if (!mondayToken || mondayToken.trim() === '') {
+      console.error('Monday.com API token is missing or empty')
+      return res.status(400).json({ error: 'Monday.com API token not configured' })
+    }
 
     // Ensure boardId is a string
     const boardId = String(process.env.MONDAY_BOARD_ID)
     console.log('Using board ID:', boardId, 'Type:', typeof boardId)
+    console.log('Using token length:', mondayToken.length, 'First 10 chars:', mondayToken.substring(0, 10))
 
     // Test basic Monday.com API access first
     console.log('Testing Monday.com API access...')
