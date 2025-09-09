@@ -1490,6 +1490,130 @@ export default function Home() {
               >
                 {isSubmitting ? 'Submitting...' : formTypeConfigs[currentFormType].submitButtonText}
               </button>
+
+              {submitError && (
+                <div style={{
+                  marginTop: '1rem',
+                  padding: '1rem',
+                  borderRadius: '4px',
+                  backgroundColor: '#f8d7da',
+                  color: '#721c24',
+                  border: '1px solid #f5c6cb',
+                  textAlign: 'center'
+                }}>
+                  {submitError}
+                </div>
+              )}
+
+              {/* Embed Form Section - Tab Specific */}
+              <div style={{
+                marginTop: '2rem',
+                padding: '1.5rem',
+                backgroundColor: '#f8f9fa',
+                borderRadius: '8px',
+                border: '1px solid #e9ecef'
+              }}>
+                <button
+                  onClick={() => setShowEmbedCode(!showEmbedCode)}
+                  style={{
+                    width: '100%',
+                    padding: '1rem',
+                    backgroundColor: '#28a745',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '4px',
+                    fontSize: '16px',
+                    fontWeight: 'bold',
+                    cursor: 'pointer',
+                    transition: 'background-color 0.2s'
+                  }}
+                >
+                  {showEmbedCode ? 'Hide Embed Code' : `Embed ${formTypeConfigs[currentFormType].label}`}
+                </button>
+
+                {showEmbedCode && (
+                  <div style={{ marginTop: '1.5rem' }}>
+                    <h3 style={{ marginBottom: '1rem', color: '#333' }}>Embeddable {formTypeConfigs[currentFormType].label} Code</h3>
+                    
+                    {/* Configuration Selection */}
+                    <div style={{ marginBottom: '1rem' }}>
+                      <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>
+                        Select Configuration to Embed:
+                      </label>
+                      <select
+                        value={selectedEmbedConfig}
+                        onChange={(e) => setSelectedEmbedConfig(e.target.value)}
+                        style={{
+                          width: '100%',
+                          padding: '0.75rem',
+                          border: '1px solid #ddd',
+                          borderRadius: '4px',
+                          fontSize: '16px',
+                          backgroundColor: 'white'
+                        }}
+                      >
+                        <option value="">Default Configuration</option>
+                        {savedConfigs
+                          .filter(config => currentFormType === 'mua' ? config.name.startsWith('MUA ') : !config.name.startsWith('MUA '))
+                          .map((config) => (
+                          <option key={config.name} value={config.name}>
+                            {config.name}
+                          </option>
+                        ))}
+                      </select>
+                      <p style={{ fontSize: '12px', color: '#666', marginTop: '0.25rem' }}>
+                        Choose a saved configuration or use the default settings
+                      </p>
+                    </div>
+
+                    <p style={{ marginBottom: '1rem', color: '#666', fontSize: '14px' }}>
+                      Copy and paste this code into your website to embed the {formTypeConfigs[currentFormType].label.toLowerCase()}:
+                    </p>
+                    <div style={{
+                      backgroundColor: '#f8f9fa',
+                      border: '1px solid #e9ecef',
+                      borderRadius: '4px',
+                      padding: '1rem',
+                      fontFamily: 'monospace',
+                      fontSize: '14px',
+                      overflow: 'auto'
+                    }}>
+                      <code>{`<div align="center">
+<iframe
+width="900"
+height="1600"
+src="${typeof window !== 'undefined' ? window.location.origin : 'https://your-domain.com'}/embed${selectedEmbedConfig ? `?config=${encodeURIComponent(selectedEmbedConfig)}` : ''}${selectedEmbedConfig ? '&' : '?'}formType=${currentFormType}">
+</iframe>
+</div>`}</code>
+                    </div>
+                    <button
+                      onClick={() => {
+                        const embedCode = `<div align="center">
+<iframe
+width="900"
+height="1600"
+src="${typeof window !== 'undefined' ? window.location.origin : 'https://your-domain.com'}/embed${selectedEmbedConfig ? `?config=${encodeURIComponent(selectedEmbedConfig)}` : ''}${selectedEmbedConfig ? '&' : '?'}formType=${currentFormType}">
+</iframe>
+</div>`
+                        navigator.clipboard.writeText(embedCode)
+                        alert('Embed code copied to clipboard!')
+                      }}
+                      style={{
+                        marginTop: '1rem',
+                        padding: '0.5rem 1rem',
+                        backgroundColor: '#007bff',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '4px',
+                        cursor: 'pointer',
+                        fontSize: '14px'
+                      }}
+                    >
+                      Copy to Clipboard
+                    </button>
+                  </div>
+                )}
+              </div>
             </form>
 
             {submitMessage && (
@@ -1507,19 +1631,6 @@ export default function Home() {
                     Your Triade URL: <a href={triadeUrl} target="_blank" rel="noopener noreferrer">{triadeUrl}</a>
                   </p>
                 )}
-              </div>
-            )}
-            {submitError && (
-              <div style={{
-                marginTop: '1rem',
-                padding: '1rem',
-                borderRadius: '4px',
-                backgroundColor: '#f8d7da',
-                color: '#721c24',
-                border: '1px solid #f5c6cb',
-                textAlign: 'center'
-              }}>
-                {submitError}
               </div>
             )}
           </div>
@@ -2070,115 +2181,6 @@ export default function Home() {
               </div>
             )}
           </div>
-        </div>
-
-        {/* Embed Form Section */}
-        <div style={{
-          maxWidth: '600px',
-          margin: '2rem auto 0',
-          backgroundColor: 'white',
-          padding: '2rem',
-          borderRadius: '8px',
-          boxShadow: '0 2px 10px rgba(0,0,0,0.1)'
-        }}>
-          <button
-            onClick={() => setShowEmbedCode(!showEmbedCode)}
-            style={{
-              width: '100%',
-              padding: '1rem',
-              backgroundColor: '#28a745',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              fontSize: '16px',
-              fontWeight: 'bold',
-              cursor: 'pointer',
-              transition: 'background-color 0.2s'
-            }}
-          >
-            {showEmbedCode ? 'Hide Embed Code' : 'Embed Form'}
-          </button>
-
-          {showEmbedCode && (
-            <div style={{ marginTop: '1.5rem' }}>
-              <h3 style={{ marginBottom: '1rem', color: '#333' }}>Embeddable Form Code</h3>
-              
-              {/* Configuration Selection */}
-              <div style={{ marginBottom: '1rem' }}>
-                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>
-                  Select Configuration to Embed:
-                </label>
-                <select
-                  value={selectedEmbedConfig}
-                  onChange={(e) => setSelectedEmbedConfig(e.target.value)}
-                  style={{
-                    width: '100%',
-                    padding: '0.75rem',
-                    border: '1px solid #ddd',
-                    borderRadius: '4px',
-                    fontSize: '16px',
-                    backgroundColor: 'white'
-                  }}
-                >
-                  <option value="">Default Configuration</option>
-                  {savedConfigs.map((config) => (
-                    <option key={config.name} value={config.name}>
-                      {config.name}
-                    </option>
-                  ))}
-                </select>
-                <p style={{ fontSize: '12px', color: '#666', marginTop: '0.25rem' }}>
-                  Choose a saved configuration or use the default settings
-                </p>
-              </div>
-
-              <p style={{ marginBottom: '1rem', color: '#666', fontSize: '14px' }}>
-                Copy and paste this code into your website to embed the wedding form:
-              </p>
-              <div style={{
-                backgroundColor: '#f8f9fa',
-                border: '1px solid #e9ecef',
-                borderRadius: '4px',
-                padding: '1rem',
-                fontFamily: 'monospace',
-                fontSize: '14px',
-                overflow: 'auto'
-              }}>
-                <code>{`<div align="center">
-<iframe
-width="900"
-height="1600"
-src="${typeof window !== 'undefined' ? window.location.origin : 'https://your-domain.com'}/embed${selectedEmbedConfig ? `?config=${encodeURIComponent(selectedEmbedConfig)}` : ''}${selectedEmbedConfig ? '&' : '?'}formType=${currentFormType}">
-</iframe>
-</div>`}</code>
-              </div>
-              <button
-                onClick={() => {
-                  const embedCode = `<div align="center">
-<iframe
-width="900"
-height="1600"
-src="${typeof window !== 'undefined' ? window.location.origin : 'https://your-domain.com'}/embed${selectedEmbedConfig ? `?config=${encodeURIComponent(selectedEmbedConfig)}` : ''}${selectedEmbedConfig ? '&' : '?'}formType=${currentFormType}">
-</iframe>
-</div>`
-                  navigator.clipboard.writeText(embedCode)
-                  alert('Embed code copied to clipboard!')
-                }}
-                style={{
-                  marginTop: '1rem',
-                  padding: '0.5rem 1rem',
-                  backgroundColor: '#007bff',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '4px',
-                  fontSize: '14px',
-                  cursor: 'pointer'
-                }}
-              >
-                Copy to Clipboard
-              </button>
-            </div>
-          )}
         </div>
 
         {/* Save/Load Configuration Section */}

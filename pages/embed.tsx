@@ -15,12 +15,6 @@ interface FormData {
   // MUA form specific fields
   hairstylistChoice?: string
   muaSelection?: string
-  // Additional fields for submission
-  services?: string[]
-  HStatus?: string
-  MStatus?: string
-  Mdecision?: string
-  Hdecision?: string
 }
 
 interface FormConfig {
@@ -219,14 +213,14 @@ export default function EmbedForm() {
         const hairstylistChoice = formData.hairstylistChoice
         
         if (hairstylistChoice === 'no, thank you') {
-          submissionData.services = ['Make-up']
+          submissionData.beautyServices = ['Make-up']
           submissionData.HStatus = 'not interested'
         } else if (hairstylistChoice === "I don't know which hairstylist to choose") {
-          submissionData.services = ['Make-up', 'Hair']
+          submissionData.beautyServices = ['Make-up', 'Hair']
           submissionData.HStatus = 'undecided- inquire availabilities'
         } else {
           // Specific hairstylist chosen
-          submissionData.services = ['Make-up', 'Hair']
+          submissionData.beautyServices = ['Make-up', 'Hair']
           submissionData.HStatus = 'Travelling fee + inquire artist'
           if (hairstylistChoice) {
             submissionData.hairstylist = hairstylistChoice
