@@ -1012,6 +1012,18 @@ export default function Home() {
         }))
         setEditableHairstylists(config.config.hairstylists || [...hairstylists])
         setEditableMakeupArtists(config.config.makeupArtists || [...makeupArtists])
+        
+        // Sync selectedMUAArtist state for MUA forms
+        if (currentFormType === 'mua') {
+          const muaField = fieldsToUse.find(f => f.id === 'muaSelection')
+          if (muaField?.preselectedValue) {
+            const artistConfig = muaArtistOptions.find(artist => artist.artistId === muaField.preselectedValue)
+            setSelectedMUAArtist(artistConfig || null)
+          } else {
+            setSelectedMUAArtist(null)
+          }
+        }
+        
         alert(`Configuration "${configName}" loaded successfully!`)
       }
     } catch (error) {
@@ -2071,25 +2083,15 @@ src="${typeof window !== 'undefined' ? window.location.origin : 'https://your-do
                         <select
                           value={(() => {
                             const muaField = formConfigs[currentFormType]?.fields?.find(f => f.id === 'muaSelection');
-                            return muaField?.preselectedValue || '';
+                            const artistId = muaField?.preselectedValue || '';
+                            // Find artist name by artistId for display
+                            const artist = muaArtistOptions.find(a => a.artistId === artistId);
+                            return artist?.artistName || '';
                           })()}
                           onChange={(e) => {
-                            const selectedValue = e.target.value
-                            setFormConfigs(prev => ({
-                              ...prev,
-                              [currentFormType]: {
-                                ...prev[currentFormType],
-                                fields: prev[currentFormType].fields.map(field => 
-                                  field.id === 'muaSelection' 
-                                    ? { ...field, preselectedValue: selectedValue }
-                                    : field
-                                )
-                              }
-                            }))
-                            
-                            // Also update the selected MUA artist state for consistency
-                            const artistConfig = muaArtistOptions.find(artist => artist.artistName === selectedValue)
-                            setSelectedMUAArtist(artistConfig || null)
+                            const selectedArtistName = e.target.value
+                            // Use the existing handleMUAArtistSelection function which properly syncs all states
+                            handleMUAArtistSelection(selectedArtistName)
                           }}
                           style={{
                             width: '100%',
