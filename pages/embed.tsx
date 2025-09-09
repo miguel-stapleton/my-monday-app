@@ -15,6 +15,11 @@ interface FormData {
   // MUA form specific fields
   hairstylistChoice?: string
   muaSelection?: string
+  // Additional fields for MUA form submission
+  HStatus?: string
+  MStatus?: string
+  Mdecision?: string
+  Hdecision?: string
 }
 
 interface FormConfig {
@@ -98,7 +103,11 @@ export default function EmbedForm() {
     hairstylist: '',
     makeupArtist: '',
     hairstylistChoice: '',
-    muaSelection: ''
+    muaSelection: '',
+    HStatus: '',
+    MStatus: '',
+    Mdecision: '',
+    Hdecision: ''
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitMessage, setSubmitMessage] = useState('')
@@ -272,7 +281,11 @@ export default function EmbedForm() {
           hairstylist: '',
           makeupArtist: '',
           hairstylistChoice: '',
-          muaSelection: ''
+          muaSelection: '',
+          HStatus: '',
+          MStatus: '',
+          Mdecision: '',
+          Hdecision: ''
         })
       } else {
         setSubmitError(data.error || 'Failed to submit form')
