@@ -271,7 +271,7 @@ export default async function handler(
         // }
         // Add the selected makeup artist to MUAs field
         if (muasId && muaMapping[formData.makeupArtist]) {
-          columnValues[muasId] = { board_id: MUA_BOARD_ID, item_ids: [muaMapping[formData.makeupArtist]] }
+          columnValues[muasId] = { board_id: parseInt(MUA_BOARD_ID), item_ids: [muaMapping[formData.makeupArtist]] }
         }
       }
     }
@@ -343,7 +343,7 @@ export default async function handler(
       const muasId = 'connect_boards' // MUAs column ID
       if (muasId) {
         columnValues[muasId] = { 
-          board_id: MUA_BOARD_ID, 
+          board_id: parseInt(MUA_BOARD_ID), 
           item_ids: [parseInt(formData.muaSelection)] 
         }
       }
