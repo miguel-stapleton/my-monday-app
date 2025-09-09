@@ -97,9 +97,14 @@ export default async function handler(
       hasMondayBoard: !!process.env.MONDAY_BOARD_ID,
       mondayTokenLength: process.env.MONDAY_API_TOKEN?.length || 0,
       mondayBoardId: process.env.MONDAY_BOARD_ID,
+      boardIdType: typeof process.env.MONDAY_BOARD_ID,
       tokenStart: process.env.MONDAY_API_TOKEN?.substring(0, 10),
       tokenEnd: process.env.MONDAY_API_TOKEN?.substring(-10)
     })
+
+    // Ensure boardId is a string
+    const boardId = String(process.env.MONDAY_BOARD_ID)
+    console.log('Using board ID:', boardId, 'Type:', typeof boardId)
 
     // Test basic Monday.com API access first
     console.log('Testing Monday.com API access...')
@@ -125,7 +130,7 @@ export default async function handler(
       },
       body: JSON.stringify({
         query: boardQuery,
-        variables: { boardId: process.env.MONDAY_BOARD_ID },
+        variables: { boardId: boardId },
       }),
     })
 
@@ -408,7 +413,7 @@ export default async function handler(
     `
 
     const variables = {
-      boardId: process.env.MONDAY_BOARD_ID,
+      boardId: boardId,
       itemName: `${formData.recordNamePrefix} - ${formData.brideName}`,
       columnValues: JSON.stringify(columnValues)
     }
