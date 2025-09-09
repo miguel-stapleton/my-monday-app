@@ -2069,7 +2069,10 @@ src="${typeof window !== 'undefined' ? window.location.origin : 'https://your-do
                           Selected Makeup Artist
                         </label>
                         <select
-                          value={formConfigs[currentFormType].fields.find(f => f.id === 'muaSelection')?.preselectedValue || ''}
+                          value={(() => {
+                            const muaField = formConfigs[currentFormType]?.fields?.find(f => f.id === 'muaSelection');
+                            return muaField?.preselectedValue || '';
+                          })()}
                           onChange={(e) => {
                             const selectedValue = e.target.value
                             setFormConfigs(prev => ({
@@ -2083,6 +2086,10 @@ src="${typeof window !== 'undefined' ? window.location.origin : 'https://your-do
                                 )
                               }
                             }))
+                            
+                            // Also update the selected MUA artist state for consistency
+                            const artistConfig = muaArtistOptions.find(artist => artist.artistName === selectedValue)
+                            setSelectedMUAArtist(artistConfig || null)
                           }}
                           style={{
                             width: '100%',
