@@ -5,6 +5,24 @@ interface FormConfigData {
   title: string
   subtitle: string
   recordNamePrefix: string
+  fields: Array<{
+    id: string
+    label: string
+    title?: string
+    subtitle?: string
+    type: string
+    required: boolean
+    enabled: boolean
+    invisible?: boolean
+    preselectedValue?: string
+    mondayColumn?: string
+    mondayColumnType?: string
+    options?: string[]
+    placeholder?: string
+    helpText?: string
+    editable?: boolean
+    editableFields?: string[]
+  }>
   hairstylists: string[]
   makeupArtists: string[]
 }
@@ -45,6 +63,61 @@ const formConfigSchema = new mongoose.Schema({
       type: String,
       required: true
     },
+    fields: [{
+      id: {
+        type: String,
+        required: true
+      },
+      label: {
+        type: String,
+        required: true
+      },
+      title: {
+        type: String
+      },
+      subtitle: {
+        type: String
+      },
+      type: {
+        type: String,
+        required: true
+      },
+      required: {
+        type: Boolean,
+        required: true
+      },
+      enabled: {
+        type: Boolean,
+        required: true
+      },
+      invisible: {
+        type: Boolean
+      },
+      preselectedValue: {
+        type: String
+      },
+      mondayColumn: {
+        type: String
+      },
+      mondayColumnType: {
+        type: String
+      },
+      options: [{
+        type: String
+      }],
+      placeholder: {
+        type: String
+      },
+      helpText: {
+        type: String
+      },
+      editable: {
+        type: Boolean
+      },
+      editableFields: [{
+        type: String
+      }]
+    }],
     hairstylists: [{
       type: String
     }],
