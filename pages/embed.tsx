@@ -240,6 +240,24 @@ export default function EmbedForm() {
         submissionData.Mdecision = 'let me choose a specific make-up artist'
         submissionData.MStatus = 'Direct choice'
         
+        // Set makeupArtist based on muaSelection for API compatibility
+        if (formData.muaSelection) {
+          // Map artist ID back to artist name for API validation
+          const artistIdToName: { [key: string]: string } = {
+            '1260830809': 'Miguel Stapleton (founder artist)',
+            '1260830807': 'Lola Carvalho (founder artist)',
+            '1260830808': 'Teresa Pilkington (founder artist)',
+            '1260830806': 'Inês Aguiar (founder artist)',
+            '1260830810': 'Ana Neves (resident artist)',
+            '1260830811': 'Ana Roma (resident artist)',
+            '1260830812': 'Sara Jogo (resident artist)',
+            '1260830813': 'Sofia Monteiro (fresh artist)',
+            '1260830814': 'Rita Nunes (fresh artist)',
+            '1260830815': 'Filipa Wahnon (fresh artist)'
+          }
+          submissionData.makeupArtist = artistIdToName[formData.muaSelection] || ''
+        }
+        
         // Set Hdecision based on hairstylist choice
         if (hairstylistChoice === 'no, thank you') {
           submissionData.Hdecision = '(not interested)'
