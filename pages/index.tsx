@@ -998,7 +998,7 @@ export default function Home() {
         console.log('[DEBUG] Config fields:', config.config.fields)
         console.log('[DEBUG] Default fields:', defaultFormFields)
         
-        const fieldsToUse = config.config.fields || [...defaultFormFields]
+        const fieldsToUse = config.config.fields || (currentFormType === 'mua' ? [...defaultMuaFormFields] : [...defaultFormFields])
         console.log('[DEBUG] Fields to use:', fieldsToUse)
         
         setFormConfigs(prev => ({
