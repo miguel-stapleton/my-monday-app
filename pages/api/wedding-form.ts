@@ -61,16 +61,16 @@ export default async function handler(
 
     // Makeup artist mapping to Monday.com board IDs
     const muaMapping: { [key: string]: number } = {
-      "Inês Aguiar (founder artist)": 1260830806,
-      "Lola Carvalho (founder artist)": 1260830807,
-      "Teresa Pilkington (founder artist)": 1260830808,
-      "Miguel Stapleton (founder artist)": 1260830809,
-      "Ana Neves (resident artist)": 1260830810,
-      "Ana Roma (resident artist)": 1260830811,
-      "Sara Jogo (resident artist)": 1260830812,
-      "Sofia Monteiro (fresh artist)": 1260830813,
-      "Rita Nunes (fresh artist)": 1260830814,
-      "Filipa Wahnon (fresh artist)": 1260830815
+      "Lola Carvalho (founder artist)": 1260830806,
+      "Teresa Pilkington (founder artist)": 1260830819,
+      "Miguel Stapleton (founder artist)": 1260830830,
+      "Inês Aguiar (founder artist)": 1265637834,
+      "Sofia Monteiro (fresh artist)": 1265637910,
+      "Rita Nunes (fresh artist)": 1555231395,
+      "Filipa Wahnon (fresh artist)": 1909973857,
+      "Ana Neves (resident artist)": 1260830858,
+      "Ana Roma (resident artist)": 1260830847,
+      "Sara Jogo (resident artist)": 1909966794
     }
 
     // Board IDs for connect_boards functionality

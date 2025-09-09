@@ -22,17 +22,17 @@ interface MUAConfig {
 const muaArtistOptions: MUAConfig[] = [
   {
     artistName: 'Lola Carvalho (founder artist)',
-    artistId: '1260830807', // Replace with actual Monday.com ID
+    artistId: '1260830806', 
     choiceColumn: 'color0' // Lolachoice column ID
   },
   {
     artistName: 'Teresa Pilkington (founder artist)', 
-    artistId: '1260830808', // Fixed to match backend mapping
+    artistId: '1260830819', 
     choiceColumn: 'color7' // Teresachoice column ID
   },
   {
     artistName: 'Miguel Stapleton (founder artist)',
-    artistId: '1260830809', // Fixed to match backend mapping
+    artistId: '1260830830', 
     choiceColumn: 'status5' // Miguelchoice column ID
   }
 ]
@@ -773,13 +773,13 @@ export default function Home() {
         const muaSelection = formConfigs[currentFormType].fields.find(f => f.id === 'muaSelection')?.preselectedValue
         if (muaSelection === 'Lola Carvalho (founder artist)') {
           submissionData.Lolachoice = 'Yes, seems right to me!'
-          submissionData.muaSelection = '1260830807' // Lola's ID
+          submissionData.muaSelection = '1260830806' // Lola's ID
         } else if (muaSelection === 'Teresa Pilkington (founder artist)') {
           submissionData.Teresachoice = 'Yes, seems right to me!' // Fix: Capital Y
-          submissionData.muaSelection = '1260830808' // Teresa's ID
+          submissionData.muaSelection = '1260830819' // Teresa's ID
         } else if (muaSelection === 'Miguel Stapleton (founder artist)') {
           submissionData.Miguelchoice = 'Yes, seems right to me!'
-          submissionData.muaSelection = '1260830809' // Miguel's ID
+          submissionData.muaSelection = '1260830830' // Miguel's ID
         }
 
         // Set MStatus to "Direct choice"
