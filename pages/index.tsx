@@ -931,7 +931,9 @@ export default function Home() {
       if (currentFormType === 'mua') {
         const muaField = configToSave.fields?.find(f => f.id === 'muaSelection')
         console.log('[DEBUG] MUA field being saved:', muaField)
+        console.log('[DEBUG] MUA field preselectedValue being saved:', muaField?.preselectedValue)
         console.log('[DEBUG] Current selectedMUAArtist state:', selectedMUAArtist)
+        console.log('[DEBUG] Current formConfigs mua fields:', formConfigs.mua.fields.find(f => f.id === 'muaSelection'))
       }
       
       console.log('[Frontend] Making fetch request to /api/form-configs')
