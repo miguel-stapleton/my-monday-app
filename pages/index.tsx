@@ -921,17 +921,19 @@ export default function Home() {
         makeupArtists: editableMakeupArtists
       }
 
-      // Add MUA prefix for MUA form configurations
-      const configName = currentFormType === 'mua' 
-        ? `MUA ${saveDialog.configName.trim()}`
-        : saveDialog.configName.trim()
-
       console.log('[Frontend] Attempting to save config:', {
-        name: configName,
+        name: saveDialog.configName,
         overwrite,
         configToSave
       })
-
+      
+      // Debug: Check if MUA selection is included in the fields being saved
+      if (currentFormType === 'mua') {
+        const muaField = configToSave.fields?.find(f => f.id === 'muaSelection')
+        console.log('[DEBUG] MUA field being saved:', muaField)
+        console.log('[DEBUG] Current selectedMUAArtist state:', selectedMUAArtist)
+      }
+      
       console.log('[Frontend] Making fetch request to /api/form-configs')
       const response = await fetch('/api/form-configs', {
         method: 'POST',
@@ -939,7 +941,7 @@ export default function Home() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          name: configName,
+          name: saveDialog.configName,
           config: configToSave,
           overwrite
         }),
