@@ -1019,6 +1019,8 @@ export default function Home() {
         if (currentFormType === 'mua') {
           const muaField = fieldsToUse.find(f => f.id === 'muaSelection')
           console.log('[DEBUG] Loading MUA config - muaField:', muaField)
+          console.log('[DEBUG] muaField preselectedValue:', muaField?.preselectedValue)
+          console.log('[DEBUG] muaField preselectedValue type:', typeof muaField?.preselectedValue)
           console.log('[DEBUG] Available muaArtistOptions:', muaArtistOptions)
           
           if (muaField?.preselectedValue) {
@@ -2092,19 +2094,14 @@ src="${typeof window !== 'undefined' ? window.location.origin : 'https://your-do
                           value={(() => {
                             const muaField = formConfigs[currentFormType]?.fields?.find(f => f.id === 'muaSelection');
                             const artistId = muaField?.preselectedValue || '';
-                            console.log('[DEBUG] Dropdown render - artistId:', artistId);
-                            // Find artist name by artistId for display
                             const artist = muaArtistOptions.find(a => a.artistId === artistId);
-                            console.log('[DEBUG] Dropdown render - found artist:', artist);
-                            const displayValue = artist?.artistName || '';
-                            console.log('[DEBUG] Dropdown render - displaying:', displayValue);
-                            return displayValue;
+                            return artist?.artistName || '';
                           })()}
                           onChange={(e) => {
                             const selectedArtistName = e.target.value
-                            console.log('[DEBUG] Dropdown onChange - selected:', selectedArtistName);
-                            // Use the existing handleMUAArtistSelection function which properly syncs all states
-                            handleMUAArtistSelection(selectedArtistName)
+                            const artistConfig = muaArtistOptions.find(a => a.artistName === selectedArtistName);
+                            setSelectedMUAArtist(artistConfig || null)
+                            updateMUAFormFields(artistConfig || null)
                           }}
                           style={{
                             width: '100%',
