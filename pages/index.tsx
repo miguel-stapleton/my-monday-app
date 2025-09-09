@@ -1578,7 +1578,12 @@ export default function Home() {
                       >
                         <option value="">Default Configuration</option>
                         {savedConfigs
-                          .filter(config => currentFormType === 'mua' ? config.name.startsWith('MUA ') : !config.name.startsWith('MUA '))
+                          .filter(config => {
+                            // For MUA form, show all configurations (since we can't reliably determine form type from name)
+                            // For Inquiry form, show all configurations as well
+                            // The form type will be specified in the embed URL parameter
+                            return true
+                          })
                           .map((config) => (
                           <option key={config.name} value={config.name}>
                             {config.name}

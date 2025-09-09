@@ -342,7 +342,10 @@ export default async function handler(
       // If muaSelection is an ID (numeric string), use it for connect_boards
       const muasId = 'connect_boards' // MUAs column ID
       if (muasId) {
-        columnValues[muasId] = { item_ids: [parseInt(formData.muaSelection)] }
+        columnValues[muasId] = { 
+          board_id: MUA_BOARD_ID, 
+          item_ids: [parseInt(formData.muaSelection)] 
+        }
       }
     }
 
