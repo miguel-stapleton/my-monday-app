@@ -222,7 +222,8 @@ export default async function handler(
     const mdecisionId = 'status7' // Mdecision column ID
     const mstatusId = 'project_status' // MStatus column ID
     const muasId = 'connect_boards' // MUAs board relation column ID
-    const hsId = 'connect_boards0' // HSs board relation column ID
+      console.log('[DEBUG] MUA Form - muaSelection:', formData.muaSelection)
+      console.log('[DEBUG] MUA Form - MUA_BOARD_ID:', MUA_BOARD_ID)    const hsId = 'connect_boards0' // HSs board relation column ID
     
     // Add support for choice fields
     const miguelchoiceId = 'status5' // Miguelchoice column ID
@@ -341,11 +342,15 @@ export default async function handler(
     if (formData.muaSelection && formData.muaSelection.match(/^\d+$/)) {
       // If muaSelection is an ID (numeric string), use it for connect_boards
       const muasId = 'connect_boards' // MUAs column ID
+      console.log('[DEBUG] MUA Form - muaSelection:', formData.muaSelection)
+      console.log('[DEBUG] MUA Form - MUA_BOARD_ID:', MUA_BOARD_ID)      console.log('[DEBUG] MUA Form - muaSelection:', formData.muaSelection)
+      console.log('[DEBUG] MUA Form - MUA_BOARD_ID:', MUA_BOARD_ID)
       if (muasId) {
         columnValues[muasId] = { 
           board_id: parseInt(MUA_BOARD_ID), 
           item_ids: [parseInt(formData.muaSelection)] 
-        }
+        console.log('[DEBUG] MUA Form - columnValues[muasId]:', columnValues[muasId])        }
+        console.log('[DEBUG] MUA Form - columnValues[muasId]:', columnValues[muasId])
       }
     }
 
