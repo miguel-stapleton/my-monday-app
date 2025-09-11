@@ -339,7 +339,7 @@ export default async function handler(
     }
 
     // Handle MUA form connect_boards (MUAs column)
-    if (muasId && muaMapping[formData.makeupArtist]) {
+    if (muasId && formData.makeupArtist && muaMapping[formData.makeupArtist]) {
       // For Inquiry forms, use makeupArtist name mapping
       columnValues[muasId] = { board_id: MUA_BOARD_ID, item_ids: [muaMapping[formData.makeupArtist]] }
     }
