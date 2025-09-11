@@ -298,6 +298,30 @@ export default async function handler(
       }
     }
 
+    // Handle MUA form connect_boards (MUAs column) - for muaSelection
+    if (formData.muaSelection && formData.muaSelection.match(/^\d+$/)) {
+      const muasId = 'connect_boards' // MUAs column ID
+      columnValues[muasId] = { 
+        board_id: MUA_BOARD_ID, 
+        item_ids: [parseInt(formData.muaSelection)]
+      }
+    }
+
+    // Handle MUA form connect_boards (MUAs column) - for makeupArtist
+    if (muasId && muaMapping[formData.makeupArtist]) {
+      columnValues[muasId] = { board_id: MUA_BOARD_ID, item_ids: [muaMapping[formData.makeupArtist]] }
+    }
+
+    // Handle MUA form connect_boards (HSs column) - for hairstylist
+    if (hsId && hairstylistMapping[formData.hairstylist]) {
+      columnValues[hsId] = { board_id: HS_BOARD_ID, item_ids: [hairstylistMapping[formData.hairstylist]] }
+    }
+
+    // Handle MUA form connect_boards (HSs column) - for hairstylistChoice
+    if (hsId && hairstylistMapping[formData.hairstylistChoice]) {
+      columnValues[hsId] = { board_id: HS_BOARD_ID, item_ids: [hairstylistMapping[formData.hairstylistChoice]] }
+    }
+
     // Handle Mdecision and Hdecision fields for MUA forms
     if (formData.Mdecision) {
       const mdecisionId = 'status7' // Mdecision column ID
@@ -336,12 +360,6 @@ export default async function handler(
       if (mstatusId) {
         columnValues[mstatusId] = { label: formData.MStatus }
       }
-    }
-
-    // Handle MUA form connect_boards (MUAs column)
-    if (muasId && formData.makeupArtist && muaMapping[formData.makeupArtist]) {
-      // For Inquiry forms, use makeupArtist name mapping
-      columnValues[muasId] = { board_id: MUA_BOARD_ID, item_ids: [muaMapping[formData.makeupArtist]] }
     }
 
     // Handle all custom Monday.com fields dynamically
