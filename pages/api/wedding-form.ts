@@ -222,7 +222,8 @@ export default async function handler(
     const mdecisionId = 'status7' // Mdecision column ID
     const mstatusId = 'project_status' // MStatus column ID
     const muasId = 'connect_boards' // MUAs board relation column ID
-    const hsId = 'connect_boards0' // HSs board relation column ID    const miguelchoiceId = 'status5' // Miguelchoice column ID
+    const hsId = 'connect_boards0' // HSs board relation column ID
+    const miguelchoiceId = 'status5' // Miguelchoice column ID
     const teresachoiceId = 'color7' // Teresachoice column ID  
     const lolachoiceId = 'color0' // Lolachoice column ID
     const secondEmailId = 'email__1' // 2nd e-mail column ID
@@ -338,13 +339,11 @@ export default async function handler(
     if (formData.muaSelection && formData.muaSelection.match(/^\d+$/)) {
       // If muaSelection is an ID (numeric string), use it for connect_boards
       const muasId = 'connect_boards' // MUAs column ID
-    const hsId = 'connect_boards0' // HSs board relation column ID      if (muasId) {
-        columnValues[muasId] = { 
+      if (muasId) {        columnValues[muasId] = { 
           board_id: parseInt(MUA_BOARD_ID), 
           item_ids: [parseInt(formData.muaSelection)]
         }
-        console.log('[DEBUG] MUA Form - columnValues[muasId]:', columnValues[muasId]) 
-        }
+        console.log('[DEBUG] MUA Form - columnValues[muasId]:', columnValues[muasId])        }
       }
     }
 
