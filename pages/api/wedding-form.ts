@@ -346,7 +346,6 @@ export default async function handler(
         }
                 console.log('[DEBUG] MUA Form - columnValues[muasId]:', columnValues[muasId])
       }
-      }
     }
 
     // Handle all custom Monday.com fields dynamically
