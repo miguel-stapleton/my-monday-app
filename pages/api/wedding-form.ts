@@ -339,11 +339,13 @@ export default async function handler(
     if (formData.muaSelection && formData.muaSelection.match(/^\d+$/)) {
       // If muaSelection is an ID (numeric string), use it for connect_boards
       const muasId = 'connect_boards' // MUAs column ID
-      if (muasId) {        columnValues[muasId] = { 
+      if (muasId) {
+        columnValues[muasId] = { 
           board_id: parseInt(MUA_BOARD_ID), 
           item_ids: [parseInt(formData.muaSelection)]
         }
-        console.log('[DEBUG] MUA Form - columnValues[muasId]:', columnValues[muasId])        }
+                console.log('[DEBUG] MUA Form - columnValues[muasId]:', columnValues[muasId])
+      }
       }
     }
 
