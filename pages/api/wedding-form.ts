@@ -74,8 +74,8 @@ export default async function handler(
     }
 
     // Board IDs for connect_boards functionality
-    const MUA_BOARD_ID = '1260830748' // MUAs board
-    const HS_BOARD_ID = '1265638639'  // HSs board (hairstylists board)
+    const MUA_BOARD_ID = 1260830748 // MUAs board
+    const HS_BOARD_ID = 1260998854  // HSs board (hairstylists board)
 
     // First, get the board columns to map the correct column IDs
     const boardQuery = `
@@ -269,7 +269,7 @@ export default async function handler(
         // }
         // Add the selected makeup artist to MUAs field
         if (muasId && muaMapping[formData.makeupArtist]) {
-          columnValues[muasId] = { board_id: parseInt(MUA_BOARD_ID), item_ids: [muaMapping[formData.makeupArtist]] }
+          columnValues[muasId] = { board_id: MUA_BOARD_ID, item_ids: [muaMapping[formData.makeupArtist]] }
         }
       }
     }
@@ -341,7 +341,7 @@ export default async function handler(
       const muasId = 'connect_boards' // MUAs column ID
       if (muasId) {
         columnValues[muasId] = { 
-          board_id: parseInt(MUA_BOARD_ID), 
+          board_id: MUA_BOARD_ID, 
           item_ids: [parseInt(formData.muaSelection)]
         }
                 console.log('[DEBUG] MUA Form - columnValues[muasId]:', columnValues[muasId])

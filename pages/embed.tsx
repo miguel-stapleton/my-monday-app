@@ -244,16 +244,16 @@ export default function EmbedForm() {
         if (formData.muaSelection) {
           // Map artist ID back to artist name for API validation
           const artistIdToName: { [key: string]: string } = {
-            '1260830809': 'Miguel Stapleton (founder artist)',
-            '1260830807': 'Lola Carvalho (founder artist)',
-            '1260830808': 'Teresa Pilkington (founder artist)',
-            '1260830806': 'Inês Aguiar (founder artist)',
-            '1260830810': 'Ana Neves (resident artist)',
-            '1260830811': 'Ana Roma (resident artist)',
-            '1260830812': 'Sara Jogo (resident artist)',
-            '1260830813': 'Sofia Monteiro (fresh artist)',
-            '1260830814': 'Rita Nunes (fresh artist)',
-            '1260830815': 'Filipa Wahnon (fresh artist)'
+            '1260830830': 'Miguel Stapleton (founder artist)',
+            '1260830806': 'Lola Carvalho (founder artist)',
+            '1260830819': 'Teresa Pilkington (founder artist)',
+            '1265637834': 'Inês Aguiar (founder artist)',
+            '1260830858': 'Ana Neves (resident artist)',
+            '1260830847': 'Ana Roma (resident artist)',
+            '1909966794': 'Sara Jogo (resident artist)',
+            '1265637910': 'Sofia Monteiro (fresh artist)',
+            '1555231395': 'Rita Nunes (fresh artist)',
+            '1909973857': 'Filipa Wahnon (fresh artist)'
           }
           submissionData.makeupArtist = artistIdToName[formData.muaSelection] || ''
         }
