@@ -270,6 +270,9 @@ export default async function handler(
         // Add the selected makeup artist to MUAs field
         if (muasId && muaMapping[formData.makeupArtist]) {
           columnValues[muasId] = { board_id: MUA_BOARD_ID, item_ids: [muaMapping[formData.makeupArtist]] }
+        } else if (muasId && formData.muaSelection && formData.muaSelection.match(/^\d+$/)) {
+          // For MUA forms, use muaSelection ID directly
+          columnValues[muasId] = { board_id: MUA_BOARD_ID, item_ids: [parseInt(formData.muaSelection)] }
         }
       }
     }
@@ -287,7 +290,7 @@ export default async function handler(
       } else if (hairstylistMapping[formData.hairstylistChoice]) {
         // Specific hairstylist selected
         if (hsId) {
-          columnValues[hsId] = { item_ids: [hairstylistMapping[formData.hairstylistChoice]] }
+          columnValues[hsId] = { board_id: HS_BOARD_ID, item_ids: [hairstylistMapping[formData.hairstylistChoice]] }
         }
         if (hstatusId) {
           columnValues[hstatusId] = { label: "Travelling fee + inquire artist" }
@@ -336,16 +339,9 @@ export default async function handler(
     }
 
     // Handle MUA form connect_boards (MUAs column)
-    if (formData.muaSelection && formData.muaSelection.match(/^\d+$/)) {
-      // If muaSelection is an ID (numeric string), use it for connect_boards
-      const muasId = 'connect_boards' // MUAs column ID
-      if (muasId) {
-        columnValues[muasId] = { 
-          board_id: MUA_BOARD_ID, 
-          item_ids: [parseInt(formData.muaSelection)]
-        }
-                console.log('[DEBUG] MUA Form - columnValues[muasId]:', columnValues[muasId])
-      }
+    if (muasId && muaMapping[formData.makeupArtist]) {
+      // For Inquiry forms, use makeupArtist name mapping
+      columnValues[muasId] = { board_id: MUA_BOARD_ID, item_ids: [muaMapping[formData.makeupArtist]] }
     }
 
     // Handle all custom Monday.com fields dynamically
@@ -382,7 +378,7 @@ export default async function handler(
         case 'color0':
         case 'Lolachoice':
           if (lolachoiceId && fieldValue) {
-            columnValues[lolachoiceId] = { label: fieldValue }
+            columnValues[lolachoiceId] = { label: formData.Lolachoice }
           }
           break
         case 'email__1':
