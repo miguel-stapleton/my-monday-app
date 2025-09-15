@@ -697,6 +697,8 @@ export default function Home() {
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
+    console.log('[DEBUG Frontend] Form submission started - currentFormType:', currentFormType)
+    
     e.preventDefault()
     
     // Validation for Inquiry form only
@@ -773,6 +775,11 @@ export default function Home() {
         const muaSelection = formConfigs[currentFormType].fields.find(f => f.id === 'muaSelection')?.preselectedValue
         console.log('[DEBUG Frontend] MUA Selection - muaSelection value:', muaSelection)
         console.log('[DEBUG Frontend] MUA Selection - muaSelection type:', typeof muaSelection)
+        console.log('[DEBUG Frontend] MUA Selection - formConfigs[currentFormType].fields:', formConfigs[currentFormType].fields)
+        
+        // Set default MUA form values
+        submissionData.MStatus = 'Direct choice'
+        submissionData.Mdecision = 'let me choose a specific make-up artist'
         
         if (muaSelection === 'Lola Carvalho (founder artist)') {
           submissionData.Lolachoice = 'Yes, seems right to me!'
@@ -788,6 +795,7 @@ export default function Home() {
           console.log('[DEBUG Frontend] MUA Selection - Set Miguel ID:', submissionData.muaSelection)
         } else {
           console.log('[DEBUG Frontend] MUA Selection - No match found for:', muaSelection)
+          console.log('[DEBUG Frontend] MUA Selection - Available fields:', formConfigs[currentFormType].fields.map(f => ({ id: f.id, preselectedValue: f.preselectedValue })))
         }
       }
 
