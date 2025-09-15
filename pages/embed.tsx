@@ -29,6 +29,8 @@ interface FormConfig {
   title: string
   subtitle: string
   recordNamePrefix: string
+  hairstylists: string[]
+  makeupArtists: string[]
 }
 
 interface SavedConfig {
@@ -121,7 +123,9 @@ export default function EmbedForm() {
   const [formConfig, setFormConfig] = useState<FormConfig>({
     title: 'Wedding Beauty Services Form',
     subtitle: 'Submit your wedding beauty service requirements',
-    recordNamePrefix: 'Wedding Beauty Service'
+    recordNamePrefix: 'Wedding Beauty Service',
+    hairstylists: defaultHairstylists,
+    makeupArtists: defaultMakeupArtists
   })
   const [hairstylists, setHairstylists] = useState(defaultHairstylists)
   const [makeupArtists, setMakeupArtists] = useState(defaultMakeupArtists)
@@ -142,7 +146,9 @@ export default function EmbedForm() {
         setFormConfig({
           title: 'MUA Application Form',
           subtitle: 'Apply to work with our beauty team',
-          recordNamePrefix: 'MUA Application'
+          recordNamePrefix: 'MUA Application',
+          hairstylists: defaultHairstylists,
+          makeupArtists: defaultMakeupArtists
         })
       }
 
@@ -156,7 +162,9 @@ export default function EmbedForm() {
               setFormConfig({
                 title: config.config.title,
                 subtitle: config.config.subtitle,
-                recordNamePrefix: config.config.recordNamePrefix
+                recordNamePrefix: config.config.recordNamePrefix,
+                hairstylists: config.config.hairstylists || defaultHairstylists,
+                makeupArtists: config.config.makeupArtists || defaultMakeupArtists
               })
               setHairstylists(config.config.hairstylists || defaultHairstylists)
               setMakeupArtists(config.config.makeupArtists || defaultMakeupArtists)
