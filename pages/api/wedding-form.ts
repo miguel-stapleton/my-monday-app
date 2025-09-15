@@ -563,6 +563,9 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<ApiResponse>
 ) {
+  console.log('[DEBUG] Wedding form API called - Method:', req.method)
+  console.log('[DEBUG] Wedding form API called - Body:', JSON.stringify(req.body, null, 2))
+  
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' })
   }
