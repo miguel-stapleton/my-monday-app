@@ -269,7 +269,7 @@ export default function EmbedForm() {
         }
         
         // Set makeupArtist based on muaSelection for API compatibility
-        if (formData.muaSelection) {
+        if (submissionData.muaSelection) {
           // Map artist ID back to artist name for API validation
           const artistIdToName: { [key: string]: string } = {
             '1260830830': 'Miguel Stapleton (founder artist)',
@@ -283,7 +283,7 @@ export default function EmbedForm() {
             '1555231395': 'Rita Nunes (fresh artist)',
             '1909973857': 'Filipa Wahnon (fresh artist)'
           }
-          submissionData.makeupArtist = artistIdToName[formData.muaSelection] || ''
+          submissionData.makeupArtist = artistIdToName[submissionData.muaSelection] || ''
         }
         
         // Set Hdecision based on hairstylist choice
