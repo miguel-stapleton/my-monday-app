@@ -20,6 +20,9 @@ interface FormData {
   MStatus?: string
   Mdecision?: string
   Hdecision?: string
+  Lolachoice?: string
+  Teresachoice?: string
+  Miguelchoice?: string
 }
 
 interface FormConfig {
@@ -107,7 +110,10 @@ export default function EmbedForm() {
     HStatus: '',
     MStatus: '',
     Mdecision: '',
-    Hdecision: ''
+    Hdecision: '',
+    Lolachoice: '',
+    Teresachoice: '',
+    Miguelchoice: ''
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitMessage, setSubmitMessage] = useState('')
@@ -240,6 +246,20 @@ export default function EmbedForm() {
         submissionData.Mdecision = 'let me choose a specific make-up artist'
         submissionData.MStatus = 'Direct choice'
         
+        // Handle MUA selection from configuration (preselected artist)
+        const muaSelection = formConfig.makeupArtists?.[0] // Get the preselected MUA from config
+        
+        if (muaSelection === 'Lola Carvalho (founder artist)') {
+          submissionData.Lolachoice = 'Yes, seems right to me!'
+          submissionData.muaSelection = '1260830806' // Lola's ID
+        } else if (muaSelection === 'Teresa Pilkington (founder artist)') {
+          submissionData.Teresachoice = 'Yes, seems right to me!'
+          submissionData.muaSelection = '1260830819' // Teresa's ID
+        } else if (muaSelection === 'Miguel Stapleton (founder artist)') {
+          submissionData.Miguelchoice = 'Yes, seems right to me!'
+          submissionData.muaSelection = '1260830830' // Miguel's ID
+        }
+        
         // Set makeupArtist based on muaSelection for API compatibility
         if (formData.muaSelection) {
           // Map artist ID back to artist name for API validation
@@ -303,7 +323,10 @@ export default function EmbedForm() {
           HStatus: '',
           MStatus: '',
           Mdecision: '',
-          Hdecision: ''
+          Hdecision: '',
+          Lolachoice: '',
+          Teresachoice: '',
+          Miguelchoice: ''
         })
       } else {
         setSubmitError(data.error || 'Failed to submit form')

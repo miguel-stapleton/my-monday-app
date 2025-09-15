@@ -772,10 +772,10 @@ export default function Home() {
         }
 
         // Handle MUA selection and set appropriate choice column
-        const muaSelection = formConfigs[currentFormType].fields.find(f => f.id === 'muaSelection')?.preselectedValue
+        const muaSelection = formConfigs[currentFormType].makeupArtists?.[0] // Get the preselected MUA from config
         console.log('[DEBUG Frontend] MUA Selection - muaSelection value:', muaSelection)
         console.log('[DEBUG Frontend] MUA Selection - muaSelection type:', typeof muaSelection)
-        console.log('[DEBUG Frontend] MUA Selection - formConfigs[currentFormType].fields:', formConfigs[currentFormType].fields)
+        console.log('[DEBUG Frontend] MUA Selection - formConfigs[currentFormType].makeupArtists:', formConfigs[currentFormType].makeupArtists)
         
         // Set default MUA form values
         submissionData.MStatus = 'Direct choice'
@@ -795,7 +795,7 @@ export default function Home() {
           console.log('[DEBUG Frontend] MUA Selection - Set Miguel ID:', submissionData.muaSelection)
         } else {
           console.log('[DEBUG Frontend] MUA Selection - No match found for:', muaSelection)
-          console.log('[DEBUG Frontend] MUA Selection - Available fields:', formConfigs[currentFormType].fields.map(f => ({ id: f.id, preselectedValue: f.preselectedValue })))
+          console.log('[DEBUG Frontend] MUA Selection - Available makeupArtists:', formConfigs[currentFormType].makeupArtists)
         }
       }
 
