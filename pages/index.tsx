@@ -111,6 +111,8 @@ interface FormConfig {
   subtitle: string
   recordNamePrefix: string
   fields: FormField[]
+  hairstylists: string[]
+  makeupArtists: string[]
 }
 
 interface SavedConfig {
@@ -520,6 +522,8 @@ interface FormConfig {
   subtitle: string
   recordNamePrefix: string
   fields: FormField[]
+  hairstylists: string[]
+  makeupArtists: string[]
 }
 
 interface SavedConfig {
@@ -544,13 +548,17 @@ const defaultFormTypeConfigs: Record<FormType, FormConfig> = {
     title: formTypeConfigs.inquiry.title,
     subtitle: formTypeConfigs.inquiry.subtitle,
     recordNamePrefix: formTypeConfigs.inquiry.recordNamePrefix,
-    fields: [...defaultInquiryFormFields]
+    fields: [...defaultInquiryFormFields],
+    hairstylists: [...hairstylists],
+    makeupArtists: [...makeupArtists]
   },
   mua: {
     title: formTypeConfigs.mua.title,
     subtitle: formTypeConfigs.mua.subtitle,
     recordNamePrefix: formTypeConfigs.mua.recordNamePrefix,
-    fields: [...defaultMuaFormFields]
+    fields: [...defaultMuaFormFields],
+    hairstylists: [...hairstylists],
+    makeupArtists: [...makeupArtists]
   }
 }
 
@@ -1021,7 +1029,9 @@ export default function Home() {
             title: config.config.title,
             subtitle: config.config.subtitle,
             recordNamePrefix: config.config.recordNamePrefix,
-            fields: fieldsToUse
+            fields: fieldsToUse,
+            hairstylists: config.config.hairstylists,
+            makeupArtists: config.config.makeupArtists
           }
         }))
         setEditableHairstylists(config.config.hairstylists || [...hairstylists])
