@@ -328,12 +328,24 @@ class ArtistSelectionService {
   private static handleMakeupArtistSelection(formData: WeddingFormData, columnValues: MondayColumnValues): void {
     let muaId: number | undefined
 
-    if (formData.muaSelection && formData.muaSelection.match(/^\d+$/)) {
-      // MUA form: use muaSelection ID directly
-      muaId = parseInt(formData.muaSelection)
+    console.log('[DEBUG] MUA Selection - formData.muaSelection:', formData.muaSelection)
+    console.log('[DEBUG] MUA Selection - formData.makeupArtist:', formData.makeupArtist)
+
+    if (formData.muaSelection) {
+      // Check if muaSelection is a numeric ID (string or number)
+      if (formData.muaSelection.match(/^\d+$/)) {
+        // MUA form: use muaSelection ID directly
+        muaId = parseInt(formData.muaSelection)
+        console.log('[DEBUG] MUA Selection - Using numeric ID:', muaId)
+      } else if (AppConstants.MUA_MAPPING[formData.muaSelection]) {
+        // MUA form: muaSelection is artist name, map to ID
+        muaId = AppConstants.MUA_MAPPING[formData.muaSelection]
+        console.log('[DEBUG] MUA Selection - Mapped artist name to ID:', formData.muaSelection, '->', muaId)
+      }
     } else if (formData.makeupArtist && AppConstants.MUA_MAPPING[formData.makeupArtist]) {
       // Inquiry form: use makeupArtist name mapping
       muaId = AppConstants.MUA_MAPPING[formData.makeupArtist]
+      console.log('[DEBUG] MUA Selection - Inquiry form mapping:', formData.makeupArtist, '->', muaId)
     }
 
     if (muaId) {
@@ -341,6 +353,9 @@ class ArtistSelectionService {
         board_id: AppConstants.BOARD_IDS.MUA, 
         item_ids: [muaId]
       }
+      console.log('[DEBUG] MUA Selection - Final column value:', columnValues[AppConstants.COLUMN_IDS.muas])
+    } else {
+      console.log('[DEBUG] MUA Selection - No MUA ID found, column will be empty')
     }
   }
 
