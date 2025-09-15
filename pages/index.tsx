@@ -771,22 +771,24 @@ export default function Home() {
 
         // Handle MUA selection and set appropriate choice column
         const muaSelection = formConfigs[currentFormType].fields.find(f => f.id === 'muaSelection')?.preselectedValue
+        console.log('[DEBUG Frontend] MUA Selection - muaSelection value:', muaSelection)
+        console.log('[DEBUG Frontend] MUA Selection - muaSelection type:', typeof muaSelection)
+        
         if (muaSelection === 'Lola Carvalho (founder artist)') {
           submissionData.Lolachoice = 'Yes, seems right to me!'
           submissionData.muaSelection = '1260830806' // Lola's ID
+          console.log('[DEBUG Frontend] MUA Selection - Set Lola ID:', submissionData.muaSelection)
         } else if (muaSelection === 'Teresa Pilkington (founder artist)') {
           submissionData.Teresachoice = 'Yes, seems right to me!' // Fix: Capital Y
           submissionData.muaSelection = '1260830819' // Teresa's ID
+          console.log('[DEBUG Frontend] MUA Selection - Set Teresa ID:', submissionData.muaSelection)
         } else if (muaSelection === 'Miguel Stapleton (founder artist)') {
           submissionData.Miguelchoice = 'Yes, seems right to me!'
           submissionData.muaSelection = '1260830830' // Miguel's ID
+          console.log('[DEBUG Frontend] MUA Selection - Set Miguel ID:', submissionData.muaSelection)
+        } else {
+          console.log('[DEBUG Frontend] MUA Selection - No match found for:', muaSelection)
         }
-
-        // Set MStatus to "Direct choice"
-        submissionData.MStatus = 'Direct choice'
-        
-        // Always set Mdecision for MUA forms
-        submissionData.Mdecision = 'let me choose a specific make-up artist'
       }
 
       // Collect preselected values from invisible fields
