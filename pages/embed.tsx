@@ -12,17 +12,15 @@ interface FormData {
   country: string
   hairstylist: string
   makeupArtist: string
-  // MUA form specific fields
-  hairstylistChoice?: string
-  muaSelection?: string
-  // Additional fields for MUA form submission
-  HStatus?: string
-  MStatus?: string
-  Mdecision?: string
-  Hdecision?: string
-  Lolachoice?: string
-  Teresachoice?: string
-  Miguelchoice?: string
+  hairstylistChoice: string
+  muaSelection: string
+  HStatus: string
+  MStatus: string
+  Mdecision: string
+  Hdecision: string
+  Lolachoice: string
+  Teresachoice: string
+  Miguelchoice: string
 }
 
 interface FormConfig {
@@ -227,6 +225,11 @@ export default function EmbedForm() {
     setSubmitError('')
     setSubmitMessage('')
 
+    console.log('[DEBUG Embedded] Form submission started')
+    console.log('[DEBUG Embedded] currentFormType:', currentFormType)
+    console.log('[DEBUG Embedded] formData:', formData)
+    console.log('[DEBUG Embedded] formConfig:', formConfig)
+
     try {
       let submissionData = { ...formData }
       
@@ -257,16 +260,26 @@ export default function EmbedForm() {
         // Handle MUA selection from configuration (preselected artist)
         const muaSelection = formConfig.makeupArtists?.[0] // Get the preselected MUA from config
         
+        console.log('[DEBUG Embedded] MUA Selection - formConfig.makeupArtists:', formConfig.makeupArtists)
+        console.log('[DEBUG Embedded] MUA Selection - muaSelection value:', muaSelection)
+        
         if (muaSelection === 'Lola Carvalho (founder artist)') {
           submissionData.Lolachoice = 'Yes, seems right to me!'
           submissionData.muaSelection = '1260830806' // Lola's ID
+          console.log('[DEBUG Embedded] Set Lola choice and ID')
         } else if (muaSelection === 'Teresa Pilkington (founder artist)') {
           submissionData.Teresachoice = 'Yes, seems right to me!'
           submissionData.muaSelection = '1260830819' // Teresa's ID
+          console.log('[DEBUG Embedded] Set Teresa choice and ID')
         } else if (muaSelection === 'Miguel Stapleton (founder artist)') {
           submissionData.Miguelchoice = 'Yes, seems right to me!'
           submissionData.muaSelection = '1260830830' // Miguel's ID
+          console.log('[DEBUG Embedded] Set Miguel choice and ID')
+        } else {
+          console.log('[DEBUG Embedded] No MUA match found for:', muaSelection)
         }
+        
+        console.log('[DEBUG Embedded] submissionData.muaSelection after logic:', submissionData.muaSelection)
         
         // Set makeupArtist based on muaSelection for API compatibility
         if (submissionData.muaSelection) {
@@ -295,6 +308,12 @@ export default function EmbedForm() {
           submissionData.Hdecision = 'let me choose a specific hairstylist'
         }
       }
+
+      console.log('[DEBUG Embedded] Final submission data:', {
+        ...submissionData,
+        recordNamePrefix: formConfig.recordNamePrefix,
+        formType: currentFormType
+      })
 
       const response = await fetch('/api/wedding-form', {
         method: 'POST',
