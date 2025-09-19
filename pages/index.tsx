@@ -936,7 +936,9 @@ export default function Home() {
       const configToSave = {
         ...formConfigs[currentFormType],
         hairstylists: editableHairstylists,
-        makeupArtists: editableMakeupArtists
+        makeupArtists: currentFormType === 'mua' && selectedMUAArtist 
+        ? [selectedMUAArtist] 
+        : editableMakeupArtists
       }
 
       console.log('[Frontend] Attempting to save config:', {
