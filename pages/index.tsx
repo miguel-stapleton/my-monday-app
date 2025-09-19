@@ -148,7 +148,7 @@ const hairstylists = [
   "Lília Costa", 
   "Andreia de Matos",
   "Eric Ribeiro",
-  "Oksana Grybbinyk",
+  "Oksana Grybinyk",
   "Joana Carvalho",
   "Olga Hilário"
 ]
@@ -470,7 +470,7 @@ const defaultMuaFormFields: FormField[] = [
       'Lília Costa',
       'Andreia de Matos',
       'Eric Ribeiro',
-      'Oksana Grybinnyk',
+      'Oksana Grybinyk',
       'Joana Carvalho',
       'Olga Hilário'
     ],
