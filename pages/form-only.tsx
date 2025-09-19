@@ -42,11 +42,11 @@ const countries = [
 
 const defaultHairstylists = [
   "I don't know which hairstylist to choose",
-  "Agne Kanapeckaite",
+  "Agne Kanapeckaite", 
   "Lília Costa", 
   "Andreia de Matos",
   "Eric Ribeiro",
-  "Oksana Grybbinyk",
+  "Oksana Grybinnyk",
   "Joana Carvalho",
   "Olga Hilário"
 ]

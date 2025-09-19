@@ -59,7 +59,7 @@ const defaultHairstylists = [
   "Lília Costa", 
   "Andreia de Matos",
   "Eric Ribeiro",
-  "Oksana Grybbinyk",
+  "Oksana Grybinnyk",
   "Joana Carvalho",
   "Olga Hilário"
 ]
