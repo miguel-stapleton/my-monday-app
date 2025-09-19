@@ -258,8 +258,9 @@ export default function EmbedForm() {
         submissionData.MStatus = 'Direct choice'
         
         // Handle MUA selection from configuration (preselected artist)
-        const muaSelection = formConfig.makeupArtists?.[0] // Get the preselected MUA from config
+        const muaSelection = makeupArtists?.[0] // Get the preselected MUA from loaded config
         
+        console.log('[DEBUG Embedded] MUA Selection - makeupArtists:', makeupArtists)
         console.log('[DEBUG Embedded] MUA Selection - formConfig.makeupArtists:', formConfig.makeupArtists)
         console.log('[DEBUG Embedded] MUA Selection - muaSelection value:', muaSelection)
         
